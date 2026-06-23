@@ -13,10 +13,9 @@ body{font-family:var(--ft);background:var(--bg);color:var(--tx);line-height:1.6;
 h1{font-family:var(--fd);font-size:1.8rem;font-weight:700;margin-bottom:.3rem;letter-spacing:-.02em}
 h1 span{color:var(--ac)}
 .sub{color:var(--mu);font-size:.88rem;margin-bottom:2rem}
-.card{background:var(--p);border:1px solid var(--bd);border-radius:10px;padding:1.4rem;margin-bottom:1rem;transition:border-color .15s}
-.card:hover{border-color:#444}
-.card h2{font-family:var(--fd);font-size:1.1rem;margin-bottom:.3rem}
-.card h2 a{color:#fff;text-decoration:none}.card h2 a:hover{color:var(--ac)}
+a.card{display:block;background:var(--p);border:1px solid var(--bd);border-radius:10px;padding:1.4rem;margin-bottom:1rem;transition:border-color .15s;text-decoration:none;color:inherit;cursor:pointer}
+a.card:hover{border-color:var(--ac)}
+.card h2{font-family:var(--fd);font-size:1.1rem;margin-bottom:.3rem;color:#fff}
 .card p{color:var(--mu);font-size:.88rem;margin-bottom:.7rem}
 .tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:600;margin-right:4px;text-transform:uppercase;letter-spacing:.03em}
 .t1{background:#22c55e15;color:var(--gn);border:1px solid #22c55e35}
@@ -35,8 +34,8 @@ h1 span{color:var(--ac)}
 <h1><span>Agent</span> Registry Mocks</h1>
 <p class="sub">Interactive prototypes exploring what an agent registry should solve, from Tier 1 core to Tier 2 governance.</p>
 
-<div class="card">
-  <h2><a href="v1.html">v1: Tier 1 Core</a></h2>
+<a class="card" href="v1.html">
+  <h2>v1: Tier 1 Core</h2>
   <p>Single-cluster registry covering the minimum viable feature set. "What do we have? Is it safe? Where do I route?"</p>
   <span class="tag t1">P1 Discovery</span>
   <span class="tag t1">P2 Inventory</span>
@@ -49,10 +48,10 @@ h1 span{color:var(--ac)}
     <span class="stat"><b>3</b> views</span>
     <span class="stat"><b>5/14</b> problems solved</span>
   </div>
-</div>
+</a>
 
-<div class="card">
-  <h2><a href="v2.html">v2: Tier 1 + Governance</a></h2>
+<a class="card" href="v2.html">
+  <h2>v2: Tier 1 + Governance</h2>
   <p>Multi-cluster registry with CVE tracking, identity/accountability chains, policy enforcement, token cost, catalog separation, and agent topology.</p>
   <span class="tag t1">Tier 1</span>
   <span class="tag t2">P6 CVEs</span>
@@ -68,7 +67,7 @@ h1 span{color:var(--ac)}
     <span class="stat"><b>5</b> views</span>
     <span class="stat"><b>12/14</b> problems solved</span>
   </div>
-</div>
+</a>
 
 <div class="foot">
   Sources: FSI AI Platform Roundtable (Jun 2026), Adel/Justin sync (Jun 2026), competitive landscape research (AWS, Google, Microsoft agent registries).
