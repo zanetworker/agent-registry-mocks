@@ -288,14 +288,14 @@ function toast(m){const t=document.getElementById('tt');t.textContent=m;t.classL
 function ce(){navigator.clipboard.writeText(`Agent Registry\nTotal: ${A.length}\nHealthy: ${A.filter(a=>a.dp==='healthy').length} | Stale: ${A.filter(a=>a.dp==='stale').length} | Shadow: ${A.filter(a=>a.dp==='shadow').length}\nSandboxed: ${A.filter(a=>a.sb==='sandboxed').length} | Unsandboxed: ${A.filter(a=>a.sb!=='sandboxed').length}\n\n${A.map(a=>`- ${a.n} [${a.dp}/${a.sb}] owner:${a.ow} ep:${a.ep} last:${a.ls}`).join('\n')}`).then(()=>toast('Copied'))}
 
 const TPL=[
-{n:"Invoice Processing Starter",desc:"Extract structured data from invoice PDFs with schema validation.",fw:"LangGraph",model:"Granite 3.3 8B",pr:["a2a","mcp"],ver:"2.1.0"},
-{n:"RAG Q&A Template",desc:"Question answering over documents with source citations.",fw:"LangGraph",model:"Llama 3.3 70B",pr:["a2a","mcp"],ver:"1.5.0"},
-{n:"Customer Support Starter",desc:"L1 ticket triage with sentiment analysis and Jira integration.",fw:"ADK",model:"Granite 3.3 8B",pr:["a2a"],ver:"1.3.0"},
-{n:"Security Scanner Agent",desc:"Automated vulnerability scanning and CVE triage with SBOM generation.",fw:"Custom",model:"Granite Code 3B",pr:["mcp"],ver:"0.9.0"},
-{n:"Data Pipeline Monitor",desc:"ETL pipeline anomaly detection with Kafka and PostgreSQL.",fw:"Custom",model:"Granite 3.3 2B",pr:["mcp"],ver:"1.0.0"},
-{n:"Compliance Auditor",desc:"Validates agent configurations against org policies.",fw:"LangGraph",model:"Granite 3.3 8B",pr:["a2a","mcp"],ver:"3.0.0"}
+{n:"Invoice Processing Starter",desc:"Extract structured data from invoice PDFs with schema validation.",fw:"LangGraph",model:"Granite 3.3 8B",pr:["a2a","mcp"],ver:"2.1.0",gh:"https://github.com/redhat-ai-agents/invoice-processing-starter",ready:true},
+{n:"RAG Q&A Template",desc:"Question answering over documents with source citations.",fw:"LangGraph",model:"Llama 3.3 70B",pr:["a2a","mcp"],ver:"1.5.0",gh:"https://github.com/redhat-ai-agents/rag-qa-template",ready:true},
+{n:"Customer Support Starter",desc:"L1 ticket triage with sentiment analysis and Jira integration.",fw:"ADK",model:"Granite 3.3 8B",pr:["a2a"],ver:"1.3.0",gh:"https://github.com/redhat-ai-agents/customer-support-starter",ready:true},
+{n:"Security Scanner Agent",desc:"Automated vulnerability scanning and CVE triage with SBOM generation.",fw:"Custom",model:"Granite Code 3B",pr:["mcp"],ver:"0.9.0",gh:"https://github.com/redhat-ai-agents/security-scanner-agent",ready:false},
+{n:"Data Pipeline Monitor",desc:"ETL pipeline anomaly detection with Kafka and PostgreSQL.",fw:"Custom",model:"Granite 3.3 2B",pr:["mcp"],ver:"1.0.0",gh:"https://github.com/redhat-ai-agents/data-pipeline-monitor",ready:true},
+{n:"Compliance Auditor",desc:"Validates agent configurations against org policies.",fw:"LangGraph",model:"Granite 3.3 8B",pr:["a2a","mcp"],ver:"3.0.0",gh:"https://github.com/redhat-ai-agents/compliance-auditor",ready:false}
 ];
-document.getElementById('tplgrid').innerHTML=TPL.map(c=>`<div class="tc"><h4>${c.n}</h4><p>${c.desc}</p><div class="tm">${c.fw} &middot; ${c.model} &middot; v${c.ver} &middot; ${c.pr.map(p=>p.toUpperCase()).join(', ')}</div><button class="db" onclick="event.stopPropagation();toast('Deploying ${c.n}. Will auto-register once running.')">Deploy</button></div>`).join('');
+document.getElementById('tplgrid').innerHTML=TPL.map(c=>`<div class="tc" style="${c.ready?'':'opacity:.55'}"><h4>${c.n}</h4><p>${c.desc}</p><div class="tm">${c.fw} &middot; ${c.model} &middot; v${c.ver} &middot; ${c.pr.map(p=>p.toUpperCase()).join(', ')}</div><div style="margin-top:.3rem"><a href="${c.gh}" target="_blank" style="font-size:.63rem;color:var(--tl);font-family:var(--fm);text-decoration:none">${c.gh.replace('https://github.com/','')}</a></div><button class="db" ${c.ready?'':'disabled style="opacity:.4;cursor:not-allowed;background:var(--dm)"'} onclick="event.stopPropagation();toast('Deploying ${c.n}. Auto-registering with sandbox + identity.')">${c.ready?'Customize &amp; Deploy':'Coming soon'}</button></div>`).join('');
 
 ren(A);
 </script>
