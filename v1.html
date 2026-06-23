@@ -86,6 +86,16 @@ td{padding:.55rem .65rem;vertical-align:middle}
 .pov-g.t1 h4{color:var(--ac)}.pov-g.t2 h4{color:var(--am)}.pov-g.t3 h4{color:var(--dm)}
 .pib{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .5rem;border-radius:4px;font-size:.66rem;margin:2px;border:1px solid var(--bd);background:var(--p2);color:var(--mu)}
 .pib.on{border-color:var(--gn);color:var(--gn);background:#22c55e08}.pib.off{border-color:var(--bd);color:var(--dm);opacity:.5;text-decoration:line-through}
+.tpl{background:var(--p);border:1px solid var(--bd);border-radius:8px;margin-bottom:1rem;overflow:hidden}
+.tpl-h{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem;cursor:pointer;user-select:none}.tpl-h:hover{background:var(--p2)}
+.tpl-h h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);font-weight:600}
+.tpl-h .arr{color:var(--dm);font-size:.8rem;transition:transform .2s}.tpl.open .arr{transform:rotate(180deg)}
+.tpl-b{display:none;padding:.5rem 1rem .8rem;border-top:1px solid var(--bd)}.tpl.open .tpl-b{display:block}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.6rem}
+.tc{background:var(--p2);border:1px solid var(--bd);border-radius:7px;padding:.7rem;transition:border-color .15s}.tc:hover{border-color:#444}
+.tc h4{font-size:.82rem;font-family:var(--fd);margin-bottom:.2rem;color:#fff}.tc p{font-size:.72rem;color:var(--mu);margin-bottom:.35rem}
+.tc .tm{font-size:.65rem;color:var(--dm);font-family:var(--fm)}
+.tc .db{margin-top:.4rem;display:inline-block;padding:.25rem .6rem;border-radius:5px;font-size:.68rem;background:var(--pu);color:#fff;border:none;cursor:pointer;font-family:var(--ft);font-weight:500}.tc .db:hover{background:#7c5ee6}
 .ebar{position:fixed;bottom:0;left:0;right:0;background:var(--p);border-top:1px solid var(--bd);padding:.65rem 1.8rem;display:flex;align-items:center;justify-content:space-between;z-index:50}
 .ebar .et{font-size:.8rem;color:var(--mu);flex:1;margin-right:.8rem;font-family:var(--fm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ebar button{background:var(--ac);border:none;color:#fff;padding:.45rem 1.1rem;border-radius:5px;cursor:pointer;font-family:var(--ft);font-weight:600;font-size:.8rem}.ebar button:hover{background:var(--ah)}
@@ -115,7 +125,7 @@ td{padding:.55rem .65rem;vertical-align:middle}
   <span class="pib off">P10 Token burn / cost</span>
 </div>
 <div class="pov-g t3"><h4>Tier 3: Scale (not solved)</h4>
-  <span class="pib off">P11 Catalog vs Registry confusion</span>
+  <span class="pib on">P11 Templates (deploy-to-register)</span>
   <span class="pib off">P12 Agent sprawl (topology)</span>
   <span class="pib off">P13 CMDB integration</span>
   <span class="pib off">P14 API-first (programmatic)</span>
@@ -137,6 +147,13 @@ td{padding:.55rem .65rem;vertical-align:middle}
   <div class="st"><div class="sv r">2</div><div class="sl">Shadow</div></div>
   <div class="st"><div class="sv t">9</div><div class="sl">Sandboxed</div></div>
   <div class="st"><div class="sv y">4</div><div class="sl">Unsandboxed</div></div>
+</div>
+<!-- Templates -->
+<div class="tpl" id="tplbox">
+  <div class="tpl-h" onclick="this.parentElement.classList.toggle('open')">
+    <h3>Templates <span style="font-weight:400;color:var(--dm)">&middot; deploy to auto-register</span></h3><span class="arr">&#9660;</span>
+  </div>
+  <div class="tpl-b"><div class="tg" id="tplgrid"></div></div>
 </div>
 <div class="fb">
   <input type="text" id="q" placeholder="Search by name or capability..." oninput="filt()">
@@ -269,6 +286,17 @@ document.getElementById('sres').innerHTML=r.length===0?'<p style="text-align:cen
 
 function toast(m){const t=document.getElementById('tt');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200)}
 function ce(){navigator.clipboard.writeText(`Agent Registry\nTotal: ${A.length}\nHealthy: ${A.filter(a=>a.dp==='healthy').length} | Stale: ${A.filter(a=>a.dp==='stale').length} | Shadow: ${A.filter(a=>a.dp==='shadow').length}\nSandboxed: ${A.filter(a=>a.sb==='sandboxed').length} | Unsandboxed: ${A.filter(a=>a.sb!=='sandboxed').length}\n\n${A.map(a=>`- ${a.n} [${a.dp}/${a.sb}] owner:${a.ow} ep:${a.ep} last:${a.ls}`).join('\n')}`).then(()=>toast('Copied'))}
+
+const TPL=[
+{n:"Invoice Processing Starter",desc:"Extract structured data from invoice PDFs with schema validation.",fw:"LangGraph",model:"Granite 3.3 8B",pr:["a2a","mcp"],ver:"2.1.0"},
+{n:"RAG Q&A Template",desc:"Question answering over documents with source citations.",fw:"LangGraph",model:"Llama 3.3 70B",pr:["a2a","mcp"],ver:"1.5.0"},
+{n:"Customer Support Starter",desc:"L1 ticket triage with sentiment analysis and Jira integration.",fw:"ADK",model:"Granite 3.3 8B",pr:["a2a"],ver:"1.3.0"},
+{n:"Security Scanner Agent",desc:"Automated vulnerability scanning and CVE triage with SBOM generation.",fw:"Custom",model:"Granite Code 3B",pr:["mcp"],ver:"0.9.0"},
+{n:"Data Pipeline Monitor",desc:"ETL pipeline anomaly detection with Kafka and PostgreSQL.",fw:"Custom",model:"Granite 3.3 2B",pr:["mcp"],ver:"1.0.0"},
+{n:"Compliance Auditor",desc:"Validates agent configurations against org policies.",fw:"LangGraph",model:"Granite 3.3 8B",pr:["a2a","mcp"],ver:"3.0.0"}
+];
+document.getElementById('tplgrid').innerHTML=TPL.map(c=>`<div class="tc"><h4>${c.n}</h4><p>${c.desc}</p><div class="tm">${c.fw} &middot; ${c.model} &middot; v${c.ver} &middot; ${c.pr.map(p=>p.toUpperCase()).join(', ')}</div><button class="db" onclick="event.stopPropagation();toast('Deploying ${c.n}. Will auto-register once running.')">Deploy</button></div>`).join('');
+
 ren(A);
 </script>
 </body>

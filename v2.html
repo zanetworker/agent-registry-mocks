@@ -179,7 +179,7 @@ td{padding:.5rem .55rem;vertical-align:middle}
       <span class="pi on"><span class="num t2">P10</span> Token burn / cost</span>
     </div>
     <div class="po-g t3"><h4>Tier 3: Scale (partially addressed)</h4>
-      <span class="pi on"><span class="num t3">P11</span> Catalog vs Registry confusion</span>
+      <span class="pi on"><span class="num t1">P11</span> Templates (deploy-to-register)</span>
       <span class="pi on"><span class="num t3">P12</span> Agent sprawl (topology)</span>
       <span class="pi off"><span class="num t3">P13</span> CMDB integration</span>
       <span class="pi off"><span class="num t3">P14</span> API-first (programmatic)</span>
@@ -189,7 +189,6 @@ td{padding:.5rem .55rem;vertical-align:middle}
 
 <div class="nv">
   <button class="on" onclick="go('reg',this)">Registry<span class="bg bg-g" id="regct">21</span></button>
-  <button onclick="go('cat',this)">Catalog<span class="bg bg-p">6</span></button>
   <button onclick="go('sea',this)">Search</button>
   <button onclick="go('topo',this)">Topology</button>
   <button onclick="go('add',this)">Register</button>
@@ -199,6 +198,13 @@ td{padding:.5rem .55rem;vertical-align:middle}
 <div id="v-reg" class="vw on">
 <div class="tier t1">Tier 1 + Tier 2: Runtime inventory with governance <span class="co t1"><span class="tip">P2: What's running where? + P9: Cross-cluster</span>2</span></div>
 <div class="sts" id="statsbar"></div>
+<!-- Templates (inline, collapsible) -->
+<div class="po" id="tplbox">
+  <div class="po-h" onclick="this.parentElement.classList.toggle('open')">
+    <h3>Templates <span style="font-weight:400;color:var(--dm)">&middot; deploy to auto-register</span> <span class="co t1"><span class="tip">P11: Templates reduce shadow IT. Agents born registered.</span>11</span></h3><span class="arr">&#9660;</span>
+  </div>
+  <div class="po-b"><div class="cc" id="catgrid"></div></div>
+</div>
 <div class="fb">
   <input type="text" id="q" placeholder="Search by name, capability, or CVE..." oninput="filt()">
   <select id="fd" onchange="filt()"><option value="a">All status</option><option value="healthy">Healthy</option><option value="stale">Stale</option><option value="shadow">Shadow</option></select>
@@ -221,14 +227,6 @@ td{padding:.5rem .55rem;vertical-align:middle}
 </tr></thead>
 <tbody id="tb"></tbody></table>
 </div>
-</div>
-
-<!-- CATALOG (Tier 3: pre-deployment) -->
-<div id="v-cat" class="vw">
-<div class="tier t3">Tier 3: Pre-deployment catalog <span class="co t3"><span class="tip">P11: Catalog vs Registry separation</span>11</span></div>
-<h2 style="margin-bottom:.2rem">Agent Catalog</h2>
-<p style="color:var(--mu);font-size:.85rem;margin-bottom:.3rem">Curated, deployable agent templates. Deploy to promote into the registry.</p>
-<div class="cc" id="catgrid"></div>
 </div>
 
 <!-- SEARCH -->
