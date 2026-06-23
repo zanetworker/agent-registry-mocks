@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Registry Mocks</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#000;--p:#0a0a0a;--bd:#292929;--tx:#E0E0E0;--mu:#A3A3A3;--ac:#EE0000;--gn:#22c55e;--am:#f59e0b;--dm:#4D4D4D;--fd:'Red Hat Display',Arial,sans-serif;--ft:'Red Hat Text',Arial,sans-serif;--fm:'Red Hat Mono','Courier New',monospace}
+body{font-family:var(--ft);background:var(--bg);color:var(--tx);line-height:1.6;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:2rem}
+.wrap{max-width:720px;width:100%}
+h1{font-family:var(--fd);font-size:1.8rem;font-weight:700;margin-bottom:.3rem;letter-spacing:-.02em}
+h1 span{color:var(--ac)}
+.sub{color:var(--mu);font-size:.88rem;margin-bottom:2rem}
+.card{background:var(--p);border:1px solid var(--bd);border-radius:10px;padding:1.4rem;margin-bottom:1rem;transition:border-color .15s}
+.card:hover{border-color:#444}
+.card h2{font-family:var(--fd);font-size:1.1rem;margin-bottom:.3rem}
+.card h2 a{color:#fff;text-decoration:none}.card h2 a:hover{color:var(--ac)}
+.card p{color:var(--mu);font-size:.88rem;margin-bottom:.7rem}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:600;margin-right:4px;text-transform:uppercase;letter-spacing:.03em}
+.t1{background:#22c55e15;color:var(--gn);border:1px solid #22c55e35}
+.t2{background:#f59e0b15;color:var(--am);border:1px solid #f59e0b35}
+.t3{background:#6b728015;color:#9ca3af;border:1px solid #6b728035}
+.stats{display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap}
+.stat{font-size:.72rem;color:var(--dm);font-family:var(--fm)}
+.stat b{color:var(--mu)}
+.doc{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--bd)}
+.doc a{color:var(--ac);text-decoration:none;font-size:.88rem}.doc a:hover{text-decoration:underline}
+.foot{margin-top:2rem;text-align:center;font-size:.72rem;color:var(--dm)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1><span>Agent</span> Registry Mocks</h1>
+<p class="sub">Interactive prototypes exploring what an agent registry should solve, from Tier 1 core to Tier 2 governance.</p>
+
+<div class="card">
+  <h2><a href="v1.html">v1: Tier 1 Core</a></h2>
+  <p>Single-cluster registry covering the minimum viable feature set. "What do we have? Is it safe? Where do I route?"</p>
+  <span class="tag t1">P1 Discovery</span>
+  <span class="tag t1">P2 Inventory</span>
+  <span class="tag t1">P3 Safety</span>
+  <span class="tag t1">P4 Shadow IT</span>
+  <span class="tag t1">P5 Routing</span>
+  <div class="stats">
+    <span class="stat"><b>13</b> agents</span>
+    <span class="stat"><b>1</b> cluster</span>
+    <span class="stat"><b>3</b> views</span>
+    <span class="stat"><b>5/14</b> problems solved</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2><a href="v2.html">v2: Tier 1 + Governance</a></h2>
+  <p>Multi-cluster registry with CVE tracking, identity/accountability chains, policy enforcement, token cost, catalog separation, and agent topology.</p>
+  <span class="tag t1">Tier 1</span>
+  <span class="tag t2">P6 CVEs</span>
+  <span class="tag t2">P7 Accountability</span>
+  <span class="tag t2">P8 Policy</span>
+  <span class="tag t2">P9 Multi-cluster</span>
+  <span class="tag t2">P10 Cost</span>
+  <span class="tag t3">P11 Catalog</span>
+  <span class="tag t3">P12 Topology</span>
+  <div class="stats">
+    <span class="stat"><b>21</b> agents</span>
+    <span class="stat"><b>4</b> clusters</span>
+    <span class="stat"><b>5</b> views</span>
+    <span class="stat"><b>12/14</b> problems solved</span>
+  </div>
+</div>
+
+<div class="doc">
+  <a href="https://github.com/zanetworker/agent-registry-mocks/blob/main/PROBLEMS.md">PROBLEMS.md</a> &mdash; Full problem breakdown with priority tiers, source quotes, competitive signals, and coverage matrix.
+</div>
+
+<div class="foot">
+  Sources: FSI AI Platform Roundtable (Jun 2026), Adel/Justin sync (Jun 2026), competitive landscape research (AWS, Google, Microsoft agent registries).
+</div>
+</div>
+</body>
+</html>

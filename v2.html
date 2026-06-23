@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Registry v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#000;--p:#0a0a0a;--p2:#111;--bd:#292929;--tx:#E0E0E0;--mu:#A3A3A3;--dm:#4D4D4D;--ac:#EE0000;--ah:#A60000;--pu:#5E40BE;--pd:#21134D;--tl:#37A3A3;--tll:#9AD8D8;--td:#004D4D;--gn:#22c55e;--gd:#22c55e20;--am:#f59e0b;--ad:#f59e0b20;--rl:#F56E6E;--fd:'Red Hat Display',Arial,sans-serif;--ft:'Red Hat Text',Arial,sans-serif;--fm:'Red Hat Mono','Courier New',monospace}
+body{font-family:var(--ft);background:var(--bg);color:var(--tx);line-height:1.5;padding-bottom:56px}
+h1,h2,h3{font-family:var(--fd);font-weight:700}
+.app{max-width:1540px;margin:0 auto;padding:1.5rem}
+/* Header */
+.hd{display:flex;align-items:center;justify-content:space-between;padding-bottom:1.2rem;border-bottom:2px solid var(--ac);margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem}
+.hd h1{font-size:1.45rem;letter-spacing:-.02em}.hd h1 span{color:var(--ac)}
+.hd-r{display:flex;align-items:center;gap:.8rem}
+.hd-m{font-size:.78rem;color:var(--mu);font-family:var(--fm)}
+.cls{background:var(--p);border:1px solid var(--bd);color:var(--mu);padding:.35rem .7rem;border-radius:5px;font-size:.78rem;font-family:var(--ft);cursor:pointer}.cls:focus{outline:none;border-color:var(--ac)}
+/* Problem overlay */
+.po{background:var(--p);border:1px solid var(--bd);border-radius:8px;margin-bottom:1rem;overflow:hidden}
+.po-h{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem;cursor:pointer;user-select:none}.po-h:hover{background:var(--p2)}
+.po-h h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);font-weight:600}
+.po-h .arr{color:var(--dm);font-size:.8rem;transition:transform .2s}.po.open .arr{transform:rotate(180deg)}
+.po-b{display:none;padding:.5rem 1rem .8rem;border-top:1px solid var(--bd)}.po.open .po-b{display:block}
+.po-g{margin-bottom:.6rem}.po-g h4{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem;font-weight:700}
+.po-g.t1 h4{color:var(--ac)}.po-g.t2 h4{color:var(--am)}.po-g.t3 h4{color:var(--dm)}
+.pi{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:4px;font-size:.7rem;margin:2px;border:1px solid var(--bd);background:var(--p2);color:var(--mu);cursor:default;position:relative}
+.pi.on{border-color:var(--gn);color:var(--gn);background:#22c55e08}.pi.off{border-color:var(--bd);color:var(--dm);opacity:.5;text-decoration:line-through}
+.pi .num{font-weight:700;font-family:var(--fm);font-size:.63rem;min-width:14px;text-align:center}
+.pi .num.t1{color:var(--ac)}.pi .num.t2{color:var(--am)}.pi .num.t3{color:var(--dm)}
+/* Callouts */
+.co{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:.55rem;font-weight:700;font-family:var(--fm);cursor:help;vertical-align:middle;margin-left:4px;position:relative}
+.co.t1{background:var(--ac);color:#fff}.co.t2{background:var(--am);color:#000}.co.t3{background:var(--dm);color:#fff}
+.co .tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid var(--bd);padding:.35rem .55rem;border-radius:5px;font-size:.68rem;font-weight:400;color:var(--tx);white-space:nowrap;z-index:300;pointer-events:none}
+.co:hover .tip{display:block}
+.co-hide .co{display:none}
+/* Nav */
+.nv{display:flex;gap:.35rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.nv button{background:var(--p);border:1px solid var(--bd);color:var(--mu);padding:.48rem 1.1rem;border-radius:6px;cursor:pointer;font-size:.82rem;font-family:var(--ft);font-weight:500;transition:all .2s;position:relative}
+.nv button:hover{border-color:#444;color:var(--tx)}.nv button.on{border-color:var(--ac);color:#fff;background:#1a0000}
+.nv .bg{position:absolute;top:-6px;right:-6px;font-size:.63rem;padding:1px 5px;border-radius:8px;font-weight:700;color:#fff}
+.bg-r{background:var(--ac)}.bg-a{background:var(--am)}.bg-g{background:var(--gn)}.bg-p{background:var(--pu)}
+.vw{display:none;animation:fi .22s ease}.vw.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+/* Stats */
+.sts{display:flex;gap:.65rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.st{background:var(--p);border:1px solid var(--bd);border-radius:8px;padding:.55rem .9rem;flex:1;min-width:85px}
+.sv{font-size:1.35rem;font-weight:700;font-family:var(--fd)}.sl{font-size:.63rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-top:1px}
+.sv.g{color:var(--gn)}.sv.a{color:var(--am)}.sv.r{color:var(--rl)}.sv.t{color:var(--tl)}.sv.y{color:#fbbf24}.sv.p{color:var(--pu)}
+/* Filter bar */
+.fb{display:flex;gap:.45rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.fb input[type=text]{background:var(--p);border:1px solid var(--bd);color:var(--tx);padding:.48rem .7rem;border-radius:6px;font-size:.84rem;flex:1;min-width:160px;font-family:var(--ft)}
+.fb input::placeholder{color:var(--dm)}
+.fb select{background:var(--p);border:1px solid var(--bd);color:var(--mu);padding:.48rem .6rem;border-radius:6px;font-size:.78rem;font-family:var(--ft);cursor:pointer}
+.fb select:focus,.fb input:focus{outline:none;border-color:var(--ac)}
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+thead th{text-align:left;padding:.5rem .55rem;border-bottom:2px solid var(--ac);font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);font-weight:600;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}tbody tr:hover{background:#111}
+td{padding:.5rem .55rem;vertical-align:middle}
+.an{font-weight:600;color:#fff;font-size:.82rem}.asb{font-size:.68rem;color:var(--dm)}
+/* Pills */
+.pl{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.pl-a{background:#22c55e20;color:#22c55e;border:1px solid #22c55e40}.pl-d{background:#5E40BE20;color:#a78bfa;border:1px solid #5E40BE40}.pl-x{background:#6b728020;color:#9ca3af;border:1px solid #6b728040}
+.pl-h{background:var(--gd);color:var(--gn);border:1px solid #22c55e40}.pl-s{background:var(--ad);color:var(--am);border:1px solid #f59e0b40}.pl-w{background:#EE000020;color:var(--rl);border:1px solid #EE000040}
+.pl-sb{background:var(--td);color:var(--tll);border:1px solid #00666640;font-size:.63rem}.pl-us{background:#3d240620;color:#fbbf24;border:1px solid #f59e0b30;font-size:.63rem}
+.pr{display:inline-block;padding:1px 5px;border-radius:3px;font-size:.61rem;font-family:var(--fm);font-weight:500;margin-right:2px}
+.pr-m{background:var(--td);color:var(--tll)}.pr-a{background:var(--pd);color:#c4b5fd}
+.cp{display:inline-block;padding:1px 5px;border-radius:3px;font-size:.66rem;background:var(--p2);border:1px solid var(--bd);color:var(--mu);margin:1px 1px}
+.mc{font-family:var(--fm);color:var(--tl);font-size:.78rem}
+/* CVE pill */
+.cve{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:3px;font-size:.63rem;font-family:var(--fm);font-weight:600}
+.cve-c{background:#EE000030;color:var(--rl);border:1px solid #EE000050}.cve-h{background:#f59e0b20;color:var(--am);border:1px solid #f59e0b40}.cve-m{background:#3b82f620;color:#60a5fa;border:1px solid #3b82f640}.cve-n{background:#22c55e10;color:var(--gn);border:1px solid #22c55e30}
+/* Token pill */
+.tk{font-family:var(--fm);font-size:.72rem;color:var(--mu)}
+/* Detail panel */
+.dp{position:fixed;top:0;right:0;width:580px;height:100vh;background:var(--p);border-left:1px solid var(--bd);z-index:100;overflow-y:auto;padding:1.5rem;transform:translateX(100%);transition:transform .22s ease}.dp.open{transform:translateX(0)}
+.dp .x{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--mu);cursor:pointer;font-size:1.2rem}.dp .x:hover{color:#fff}
+.ds{margin-bottom:1.1rem}.ds h3{font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);margin-bottom:.4rem;font-weight:600}
+.df{display:flex;justify-content:space-between;padding:.22rem 0;border-bottom:1px solid #1a1a1a}.df .l{color:var(--mu);font-size:.78rem}.df .v{color:#fff;font-size:.78rem;font-family:var(--fm);text-align:right;max-width:280px;word-break:break-all}
+.sm{display:flex;align-items:center;gap:.4rem;margin:.6rem 0}.sn{padding:.22rem .55rem;border-radius:5px;font-size:.7rem;font-weight:600;border:1px solid var(--bd);color:var(--mu);background:var(--p2)}
+.sn.cur{border-color:var(--gn);color:var(--gn);background:#22c55e12}.sn.cur-d{border-color:var(--pu);color:#a78bfa;background:#5E40BE12}.sn.cur-x{border-color:#6b7280;color:#9ca3af;background:#6b728012}
+.sa{color:var(--dm);font-size:.76rem}
+.mcc{background:var(--p2);border:1px solid var(--bd);border-radius:7px;padding:.55rem;margin-bottom:.4rem}
+.mcc h4{font-size:.8rem;color:var(--tl);font-weight:600;margin-bottom:.3rem}
+.mt{display:inline-block;padding:1px 5px;border-radius:3px;font-size:.66rem;font-family:var(--fm);background:#111;border:1px solid var(--bd);color:var(--mu);margin:1px}
+.spk{display:flex;align-items:end;gap:1px;height:28px;margin:.35rem 0}.spk .b{width:4px;border-radius:1px;min-height:2px}.b.up{background:var(--gn)}.b.dn{background:var(--am)}.b.z{background:var(--dm)}
+.ai{padding:.3rem 0;border-bottom:1px solid #1a1a1a;font-size:.76rem}.ai .tm{color:var(--dm);font-size:.68rem;font-family:var(--fm)}.ai .ac{color:var(--tll)}
+.acts{display:flex;gap:.4rem;margin-top:.8rem;flex-wrap:wrap}
+.btn{padding:.35rem .8rem;border-radius:5px;font-size:.76rem;cursor:pointer;font-family:var(--ft);font-weight:500;transition:all .2s;border:1px solid var(--bd)}
+.btn-p{background:var(--ac);border-color:var(--ac);color:#fff}.btn-p:hover{background:var(--ah)}
+.btn-s{background:var(--p2);color:var(--tx)}.btn-s:hover{border-color:#444}
+.btn-d{background:#7f1d1d;border-color:#991b1b;color:#fca5a5}.btn-d:hover{background:#991b1b}
+.btn-g{background:#14532d;border-color:#166534;color:#86efac}.btn-g:hover{background:#166534}
+/* Policy card */
+.pol{background:var(--p2);border:1px solid var(--bd);border-radius:5px;padding:.4rem .6rem;margin-bottom:.35rem;display:flex;align-items:center;justify-content:space-between}
+.pol .pn{font-size:.78rem;font-weight:500}.pol .pt{font-size:.65rem;color:var(--mu);font-family:var(--fm)}
+/* Identity chain */
+.ic{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;margin:.4rem 0}
+.ic .node{padding:.2rem .5rem;border-radius:4px;font-size:.72rem;font-weight:500;border:1px solid var(--bd);background:var(--p2)}
+.ic .node.usr{border-color:var(--tl);color:var(--tll)}.ic .node.agt{border-color:var(--pu);color:#c4b5fd}.ic .arr{color:var(--dm);font-size:.7rem}
+/* Search */
+.sh{text-align:center;padding:1.5rem 0}.sh h2{font-size:1.3rem;margin-bottom:.35rem}.sh p{color:var(--mu);margin-bottom:1rem}
+.siw{max-width:560px;margin:0 auto}.siw input{width:100%;background:var(--p);border:1px solid var(--bd);color:var(--tx);padding:.65rem .85rem;border-radius:7px;font-size:.9rem;font-family:var(--ft)}.siw input:focus{outline:none;border-color:var(--ac)}
+.ssg{display:flex;gap:.35rem;justify-content:center;margin-top:.6rem;flex-wrap:wrap}
+.ssg span{padding:.22rem .55rem;border-radius:14px;font-size:.7rem;cursor:pointer;background:var(--p2);border:1px solid var(--bd);color:var(--mu);transition:all .2s}.ssg span:hover{border-color:var(--ac);color:var(--tx)}
+.sr{margin-top:1.2rem}
+.src{background:var(--p);border:1px solid var(--bd);border-radius:9px;padding:.85rem 1rem;margin-bottom:.55rem;cursor:pointer;transition:all .15s}.src:hover{border-color:#444}
+.src .rh{display:flex;justify-content:space-between;align-items:center}.src .rn{font-weight:600;color:#fff;font-size:.88rem}.src .rd{color:var(--mu);font-size:.78rem;margin:.2rem 0}
+.rel{display:inline-block;padding:1px 7px;border-radius:3px;font-size:.66rem;font-weight:600;font-family:var(--fm)}
+.rel-h{background:#22c55e20;color:#22c55e}.rel-m{background:#f59e0b20;color:#f59e0b}
+/* Register */
+.rf{background:var(--p);border:1px solid var(--bd);border-radius:9px;padding:1.2rem;margin-top:.8rem}
+.fg{margin-bottom:.75rem}.fg label{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);margin-bottom:.25rem;font-weight:600}
+.fg input,.fg select{width:100%;background:var(--p2);border:1px solid var(--bd);color:var(--tx);padding:.45rem .65rem;border-radius:5px;font-size:.82rem;font-family:var(--ft)}.fg input:focus{outline:none;border-color:var(--ac)}
+/* Catalog */
+.cc{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.8rem;margin-top:.8rem}
+.ccard{background:var(--p);border:1px solid var(--bd);border-radius:9px;padding:1rem;transition:border-color .15s;cursor:pointer}.ccard:hover{border-color:#444}
+.ccard h3{font-size:.92rem;margin-bottom:.3rem}.ccard p{font-size:.78rem;color:var(--mu);margin-bottom:.5rem}
+.ccard .meta{font-size:.7rem;color:var(--dm);font-family:var(--fm)}
+.ccard .dbtn{margin-top:.6rem;display:inline-block;padding:.3rem .7rem;border-radius:5px;font-size:.72rem;background:var(--pu);color:#fff;border:none;cursor:pointer;font-family:var(--ft);font-weight:500}.ccard .dbtn:hover{background:#7c5ee6}
+/* Topology */
+.topo{background:var(--p);border:1px solid var(--bd);border-radius:9px;padding:1.2rem;margin-top:.8rem}
+.topo svg{width:100%;height:420px}
+.topo text{font-family:var(--ft);font-size:11px;fill:var(--tx)}
+.topo .edge{stroke:var(--bd);stroke-width:1.5;fill:none;marker-end:url(#arrowhead)}
+.topo .node-r{fill:var(--p2);stroke:var(--bd);stroke-width:1;rx:6}
+/* Tier labels */
+.tier{display:inline-flex;align-items:center;gap:.25rem;padding:.16rem .45rem;border-radius:3px;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem}
+.t1{background:#22c55e10;color:var(--gn);border:1px solid #22c55e30}.t2{background:#f59e0b10;color:var(--am);border:1px solid #f59e0b30}.t3{background:#6b728010;color:#9ca3af;border:1px solid #6b728030}
+.toast{position:fixed;bottom:72px;right:2rem;background:var(--gn);color:#000;padding:.5rem 1rem;border-radius:7px;font-weight:600;font-size:.8rem;transform:translateY(90px);opacity:0;transition:all .25s;z-index:200}.toast.show{transform:translateY(0);opacity:1}
+.ebar{position:fixed;bottom:0;left:0;right:0;background:var(--p);border-top:1px solid var(--bd);padding:.6rem 1.5rem;display:flex;align-items:center;justify-content:space-between;z-index:50}
+.ebar .et{font-size:.78rem;color:var(--mu);flex:1;margin-right:.8rem;font-family:var(--fm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ebar button{background:var(--ac);border:none;color:#fff;padding:.4rem 1rem;border-radius:5px;cursor:pointer;font-family:var(--ft);font-weight:600;font-size:.78rem}.ebar button:hover{background:var(--ah)}
+.alert-row{background:#1a0505!important;border-left:3px solid var(--ac)!important}
+.warn-row{background:#1a1005!important;border-left:3px solid var(--am)!important}
+.cve-row{border-left:3px solid var(--am)!important}
+/* Toggle */
+.tgl{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--mu);cursor:pointer;user-select:none}
+.tgl input{accent-color:var(--ac)}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hd">
+  <h1><span>Agent</span> Registry <sup style="font-size:.55rem;color:var(--dm);font-weight:400">v2</sup></h1>
+  <div class="hd-r">
+    <select class="cls" id="clsel" onchange="switchCluster()">
+      <option value="all">All clusters (4)</option>
+      <option value="ocp1">ocp1 / workload</option>
+      <option value="ocp2">ocp2 / gpu</option>
+      <option value="aws">aws-eks / prod</option>
+      <option value="edge">edge-fleet / retail</option>
+    </select>
+    <label class="tgl"><input type="checkbox" id="annot" onchange="toggleAnn()" checked> Annotations</label>
+    <div class="hd-m" id="hdsync">21 agents across 4 clusters</div>
+  </div>
+</div>
+
+<!-- Problem overlay -->
+<div class="po open" id="pov">
+  <div class="po-h" onclick="this.parentElement.classList.toggle('open')">
+    <h3>Problems solved by this mock</h3><span class="arr">&#9660;</span>
+  </div>
+  <div class="po-b">
+    <div class="po-g t1"><h4>Tier 1: Core (highest priority)</h4>
+      <span class="pi on"><span class="num t1">P1</span> Duplicate agents across teams</span>
+      <span class="pi on"><span class="num t1">P2</span> What's running where?</span>
+      <span class="pi on"><span class="num t1">P3</span> Is it safe? (sandbox + health)</span>
+      <span class="pi on"><span class="num t1">P4</span> Shadow IT for agents</span>
+      <span class="pi on"><span class="num t1">P5</span> Where do I route?</span>
+    </div>
+    <div class="po-g t2"><h4>Tier 2: Governance (new in v2)</h4>
+      <span class="pi on"><span class="num t2">P6</span> Vulnerability blast radius</span>
+      <span class="pi on"><span class="num t2">P7</span> Who gets fired? (accountability)</span>
+      <span class="pi on"><span class="num t2">P8</span> What's allowed? (policy)</span>
+      <span class="pi on"><span class="num t2">P9</span> Cross-cluster blind spots</span>
+      <span class="pi on"><span class="num t2">P10</span> Token burn / cost</span>
+    </div>
+    <div class="po-g t3"><h4>Tier 3: Scale (partially addressed)</h4>
+      <span class="pi on"><span class="num t3">P11</span> Catalog vs Registry confusion</span>
+      <span class="pi on"><span class="num t3">P12</span> Agent sprawl (topology)</span>
+      <span class="pi off"><span class="num t3">P13</span> CMDB integration</span>
+      <span class="pi off"><span class="num t3">P14</span> API-first (programmatic)</span>
+    </div>
+  </div>
+</div>
+
+<div class="nv">
+  <button class="on" onclick="go('reg',this)">Registry<span class="bg bg-g" id="regct">21</span></button>
+  <button onclick="go('cat',this)">Catalog<span class="bg bg-p">6</span></button>
+  <button onclick="go('sea',this)">Search</button>
+  <button onclick="go('topo',this)">Topology</button>
+  <button onclick="go('add',this)">Register</button>
+</div>
+
+<!-- REGISTRY -->
+<div id="v-reg" class="vw on">
+<div class="tier t1">Tier 1 + Tier 2: Runtime inventory with governance <span class="co t1"><span class="tip">P2: What's running where? + P9: Cross-cluster</span>2</span></div>
+<div class="sts" id="statsbar"></div>
+<div class="fb">
+  <input type="text" id="q" placeholder="Search by name, capability, or CVE..." oninput="filt()">
+  <select id="fd" onchange="filt()"><option value="a">All status</option><option value="healthy">Healthy</option><option value="stale">Stale</option><option value="shadow">Shadow</option></select>
+  <select id="fs" onchange="filt()"><option value="a">All sandbox</option><option value="sandboxed">Sandboxed</option><option value="unsandboxed">Unsandboxed</option></select>
+  <select id="fc" onchange="filt()"><option value="a">All CVE severity</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option><option value="none">None</option></select>
+  <select id="fo" onchange="filt()"><option value="a">All owners</option><option value="ai">AI Team</option><option value="plat">Platform Team</option><option value="devops">DevOps</option><option value="retail">Retail Eng</option><option value="unk">Unknown</option></select>
+</div>
+<div style="overflow-x:auto">
+<table><thead><tr>
+  <th>Agent <span class="co t1"><span class="tip">P2: What's running where?</span>2</span></th>
+  <th>Cluster <span class="co t2"><span class="tip">P9: Cross-cluster visibility</span>9</span></th>
+  <th>Status</th>
+  <th>Sandbox <span class="co t1"><span class="tip">P3: Is it safe?</span>3</span></th>
+  <th>CVEs <span class="co t2"><span class="tip">P6: Vulnerability blast radius</span>6</span></th>
+  <th>Owner <span class="co t2"><span class="tip">P7: Accountability</span>7</span></th>
+  <th>Capabilities</th>
+  <th>Tokens/d <span class="co t2"><span class="tip">P10: Token burn / cost</span>10</span></th>
+  <th>Protocol</th>
+  <th>Last seen</th>
+</tr></thead>
+<tbody id="tb"></tbody></table>
+</div>
+</div>
+
+<!-- CATALOG (Tier 3: pre-deployment) -->
+<div id="v-cat" class="vw">
+<div class="tier t3">Tier 3: Pre-deployment catalog <span class="co t3"><span class="tip">P11: Catalog vs Registry separation</span>11</span></div>
+<h2 style="margin-bottom:.2rem">Agent Catalog</h2>
+<p style="color:var(--mu);font-size:.85rem;margin-bottom:.3rem">Curated, deployable agent templates. Deploy to promote into the registry.</p>
+<div class="cc" id="catgrid"></div>
+</div>
+
+<!-- SEARCH -->
+<div id="v-sea" class="vw">
+<div class="tier t1">Tier 1: Capability discovery <span class="co t1"><span class="tip">P1: Duplicate agents across teams</span>1</span></div>
+<div class="sh">
+  <h2>Find agents by capability</h2>
+  <p>Search before you build. Discover what already exists across all clusters.</p>
+  <div class="siw"><input type="text" id="sq" placeholder="Find agents that can..." oninput="doS()"></div>
+  <div class="ssg">
+    <span onclick="sf('process invoices')">process invoices</span>
+    <span onclick="sf('review code')">review code</span>
+    <span onclick="sf('customer support')">customer support</span>
+    <span onclick="sf('vulnerability')">vulnerability scan</span>
+    <span onclick="sf('summarize')">summarize</span>
+    <span onclick="sf('compliance')">compliance</span>
+  </div>
+</div>
+<div id="sres" class="sr"></div>
+</div>
+
+<!-- TOPOLOGY -->
+<div id="v-topo" class="vw">
+<div class="tier t3">Tier 3: Agent relationships <span class="co t3"><span class="tip">P12: Agent sprawl / topology</span>12</span></div>
+<h2 style="margin-bottom:.2rem">Agent Topology</h2>
+<p style="color:var(--mu);font-size:.85rem;margin-bottom:.3rem">Delegation and dependency relationships across agents.</p>
+<div class="topo" id="topobox"></div>
+</div>
+
+<!-- REGISTER -->
+<div id="v-add" class="vw">
+<div class="tier t2">Tier 2: Registration <span class="co t1"><span class="tip">P4: Shadow IT detection</span>4</span></div>
+<h2 style="margin-bottom:.2rem">Register an agent</h2>
+<p style="color:var(--mu);font-size:.85rem;margin-bottom:.7rem">Bring an existing agent under governance. Attach identity and policies at registration.</p>
+<div class="rf">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+    <div class="fg"><label>Agent name</label><input type="text" placeholder="Invoice Processing Agent"></div>
+    <div class="fg"><label>Endpoint URL</label><input type="text" placeholder="https://agent.example.com/a2a"></div>
+    <div class="fg"><label>Cluster / Namespace</label><select><option>ocp1 / agents</option><option>ocp2 / inference</option><option>aws-eks / prod</option><option>edge-fleet / retail</option></select></div>
+    <div class="fg"><label>Owner</label><select><option>AI Team</option><option>Platform Team</option><option>DevOps</option><option>Retail Eng</option></select></div>
+    <div class="fg"><label>Protocol</label><select><option>A2A</option><option>MCP</option><option>Both</option></select></div>
+    <div class="fg"><label>Sandbox state</label><select><option>Sandboxed (OpenShell)</option><option>Unsandboxed</option></select></div>
+    <div class="fg"><label>Identity provider <span class="co t2"><span class="tip">P7: Accountability chain</span>7</span></label><select><option>OIDC (Keycloak)</option><option>mTLS (SPIFFE)</option><option>Entra Agent ID</option><option>API Key (legacy)</option></select></div>
+    <div class="fg"><label>Delegation sponsor <span class="co t2"><span class="tip">P7: Who gets fired?</span>7</span></label><input type="text" placeholder="sarah.chen@company.com"></div>
+  </div>
+  <div class="fg"><label>Description</label><input type="text" placeholder="What does this agent do?"></div>
+  <div class="fg"><label>Capabilities (comma separated)</label><input type="text" placeholder="invoice-extraction, pdf-parsing, data-validation"></div>
+  <div class="fg"><label>Policies to attach <span class="co t2"><span class="tip">P8: What's allowed?</span>8</span></label><select multiple style="height:60px"><option>network-egress-deny</option><option>fs-readonly</option><option>no-pii-exfil</option><option>rate-limit-1000</option></select></div>
+  <div style="margin-top:.6rem"><button class="btn btn-g" onclick="toast('Agent registered as Draft. Pending approval. Identity provisioned.')">Register as Draft</button></div>
+</div>
+</div>
+</div>
+
+<div class="dp" id="dp"><button class="x" onclick="cd()">&times;</button><div id="dc"></div></div>
+<div class="toast" id="tt"></div>
+<div class="ebar"><span class="et" id="et"></span><button onclick="ce()">Copy summary</button></div>
+
+<script>
+const A=[
+{id:1,n:"Invoice Processing Agent",v:"2.1.0",cl:"ocp1",clns:"agents",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["invoice-extraction","pdf-parsing","data-validation"],pr:["a2a","mcp"],ls:"2m ago",ep:"https://invoice-agent.apps.ocp1.example.com/a2a",desc:"Extracts structured data from invoice PDFs, validates against schema, writes to accounting system.",auth:"OIDC (Keycloak)",fw:"LangGraph",model:"Granite 3.3 8B",cves:[],tokD:145000,costD:0.42,policies:["network-egress-deny","fs-readonly"],delegatedBy:"sarah.chen",delegationType:"oidc-exchange",connAgents:[{id:5,rel:"validated-by"}],mcps:[{n:"PostgreSQL MCP",tools:["query","insert","update"],sc:["invoices_db:rw"]},{n:"DocExtract MCP",tools:["extract_pdf","ocr"],sc:["documents:read"]}],hp:[8,9,7,10,9,8,10,9,8,7,9,10,8,9,10,8,7,9,10,9,8,10,9,8,7,9,10,8,9,10],act:[{t:"2h ago",x:"Health check passed",a:"system"},{t:"1d ago",x:"Version 2.0.3 → 2.1.0",a:"sarah.chen"}],lc:"active"},
+{id:2,n:"Sales Research Agent",v:"2.0.1",cl:"ocp1",clns:"agents",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["lead-research","company-analysis","market-intel"],pr:["a2a","mcp"],ls:"5m ago",ep:"https://sales-research.apps.ocp1.example.com/a2a",desc:"Researches prospects from web data and CRM history. Produces briefing documents.",auth:"OIDC (Keycloak)",fw:"CrewAI",model:"Llama 3.3 70B",cves:[],tokD:312000,costD:1.85,policies:["network-egress-deny","no-pii-exfil"],delegatedBy:"sarah.chen",delegationType:"oidc-exchange",connAgents:[],mcps:[{n:"Web Search MCP",tools:["search","fetch_page"],sc:["web:read"]},{n:"CRM MCP",tools:["get_contact","get_company"],sc:["crm:read"]}],hp:[9,10,8,9,10,9,8,10,9,10,8,9,10,9,8,10,9,10,8,9,10,9,8,10,9,10,8,9,10,9],act:[{t:"5m ago",x:"Task: lead briefing complete",a:"system"}],lc:"active"},
+{id:3,n:"Customer Support Agent",v:"1.3.0",cl:"ocp1",clns:"agents",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["ticket-triage","sentiment-analysis","escalation"],pr:["a2a"],ls:"1m ago",ep:"https://support-agent.apps.ocp1.example.com/a2a",desc:"L1 support triage with multi-turn conversation and automatic escalation.",auth:"OIDC (Keycloak)",fw:"ADK",model:"Granite 3.3 8B",cves:[],tokD:890000,costD:2.58,policies:["no-pii-exfil","rate-limit-1000"],delegatedBy:"mike.ross",delegationType:"oidc-exchange",connAgents:[{id:5,rel:"audited-by"}],mcps:[{n:"Jira MCP",tools:["create_issue","update_issue","add_comment"],sc:["jira:rw"]},{n:"Slack MCP",tools:["post_message","get_thread"],sc:["slack:rw"]}],hp:[10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,10],act:[{t:"1m ago",x:"Ticket resolved SUPPORT-4521",a:"system"}],lc:"active"},
+{id:4,n:"Data Pipeline Monitor",v:"1.0.2",cl:"ocp1",clns:"monitoring",dp:"healthy",sb:"sandboxed",ow:"DevOps",ok:"devops",caps:["pipeline-monitoring","anomaly-detection","alerting"],pr:["mcp"],ls:"30s ago",ep:"mcp://pipeline-monitor.agents.svc:8080",desc:"Monitors ETL pipelines for anomalies, routes alerts.",auth:"mTLS (SPIFFE)",fw:"Custom",model:"Granite 3.3 2B",cves:[],tokD:45000,costD:0.09,policies:["network-egress-deny","fs-readonly"],delegatedBy:"ops-service",delegationType:"spiffe-exchange",connAgents:[],mcps:[{n:"Kafka MCP",tools:["list_topics","get_consumer_lag"],sc:["kafka:read"]}],hp:[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10],act:[{t:"30s ago",x:"Health check passed",a:"system"}],lc:"active"},
+{id:5,n:"Compliance Checker",v:"3.1.0",cl:"ocp1",clns:"platform",dp:"healthy",sb:"sandboxed",ow:"Platform Team",ok:"plat",caps:["policy-validation","audit-logging","compliance-reporting"],pr:["a2a","mcp"],ls:"3m ago",ep:"https://compliance.apps.ocp1.example.com/a2a",desc:"Validates agent configs against org policies. Generates compliance reports.",auth:"OIDC (Keycloak)",fw:"LangGraph",model:"Granite 3.3 8B",cves:[],tokD:78000,costD:0.23,policies:["fs-readonly"],delegatedBy:"platform-admin",delegationType:"oidc-exchange",connAgents:[{id:1,rel:"validates"},{id:3,rel:"audits"}],mcps:[{n:"PostgreSQL MCP",tools:["query"],sc:["audit_db:read"]}],hp:[9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10],act:[{t:"3m ago",x:"Scan: 21 agents, 0 violations",a:"system"}],lc:"active"},
+{id:6,n:"Meeting Summarizer",v:"1.1.0",cl:"ocp2",clns:"ai-tools",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["transcription","summarization","action-items"],pr:["mcp"],ls:"20m ago",ep:"mcp://meeting-sum.ocp2.svc:8080",desc:"Processes recordings, generates summaries with action items. GPU cluster for whisper inference.",auth:"mTLS (SPIFFE)",fw:"Custom",model:"Granite 3.3 8B",cves:[],tokD:220000,costD:0.64,policies:["no-pii-exfil","fs-readonly"],delegatedBy:"sarah.chen",delegationType:"spiffe-exchange",connAgents:[],mcps:[{n:"S3 MCP",tools:["get_object","put_object"],sc:["recordings:read","summaries:write"]}],hp:[8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10],act:[{t:"20m ago",x:"Summarized Q3 Planning Sync",a:"system"}],lc:"active"},
+{id:7,n:"Doc QA Agent",v:"1.5.2",cl:"ocp2",clns:"ai-tools",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["document-qa","rag","source-citation"],pr:["a2a","mcp"],ls:"8m ago",ep:"https://doc-qa.apps.ocp2.example.com/a2a",desc:"RAG question answering over internal docs with source citations. GPU for embedding.",auth:"OIDC (Keycloak)",fw:"LangGraph",model:"Llama 3.3 70B",cves:[{id:"CVE-2026-3821",sev:"medium",comp:"langchain 0.3.1",fix:"Upgrade to 0.3.2"}],tokD:510000,costD:3.02,policies:["network-egress-deny","no-pii-exfil"],delegatedBy:"sarah.chen",delegationType:"oidc-exchange",connAgents:[],mcps:[{n:"PostgreSQL MCP",tools:["query","vector_search"],sc:["docs_db:read"]},{n:"S3 MCP",tools:["get_object"],sc:["documents:read"]}],hp:[10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10],act:[{t:"8m ago",x:"Query: 'How do I configure mTLS?'",a:"system"}],lc:"active"},
+{id:8,n:"Deployment Validator",v:"0.9.1",cl:"ocp1",clns:"platform",dp:"healthy",sb:"unsandboxed",ow:"Platform Team",ok:"plat",caps:["manifest-validation","image-scanning","resource-checks"],pr:["mcp"],ls:"1m ago",ep:"mcp://deploy-val.platform.svc:8080",desc:"Pre-deploy validation. Needs cluster-wide read. Unsandboxed: requires broad K8s API access.",auth:"mTLS (SPIFFE)",fw:"Custom",model:"Granite Code 3B",cves:[{id:"CVE-2026-4102",sev:"high",comp:"go-yaml v3.0.0",fix:"Upgrade to v3.0.1"}],tokD:62000,costD:0.12,policies:["rate-limit-1000"],delegatedBy:"platform-admin",delegationType:"spiffe-exchange",connAgents:[{id:5,rel:"validated-by"}],mcps:[{n:"GitHub MCP",tools:["get_file","get_pr","get_diff"],sc:["repos:read"]}],hp:[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10],act:[{t:"1m ago",x:"Validated: orders-service v2.3.1",a:"system"}],lc:"active"},
+{id:9,n:"Code Review Agent",v:"1.2.0",cl:"ocp1",clns:"agents",dp:"stale",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["code-review","security-analysis","style-checking"],pr:["a2a","mcp"],ls:"14d ago",ep:"https://code-review.apps.ocp1.example.com/a2a",desc:"Automated PR review. Not responding since 14 days.",auth:"OIDC (Keycloak)",fw:"LangGraph",model:"Granite Code 3B",cves:[{id:"CVE-2026-3821",sev:"medium",comp:"langchain 0.3.1",fix:"Upgrade to 0.3.2"},{id:"CVE-2026-2910",sev:"high",comp:"base-image ubi9",fix:"Rebuild"}],tokD:0,costD:0,policies:["network-egress-deny","fs-readonly"],delegatedBy:"sarah.chen",delegationType:"oidc-exchange",connAgents:[],mcps:[{n:"GitHub MCP",tools:["get_pr","get_diff","post_review"],sc:["repos:rw"]}],hp:[10,9,10,8,9,7,5,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],act:[{t:"14d ago",x:"Last health check passed",a:"system"}],lc:"active"},
+{id:10,n:"Legacy Report Generator",v:"0.5.0",cl:"ocp1",clns:"reporting",dp:"stale",sb:"unsandboxed",ow:"DevOps",ok:"devops",caps:["report-generation","data-aggregation"],pr:["mcp"],ls:"45d ago",ep:"mcp://legacy-reports.agents.svc:8080",desc:"Deprecated. Replaced by Data Pipeline Monitor.",auth:"API Key",fw:"Custom",model:"GPT-4o (external)",cves:[{id:"CVE-2026-1001",sev:"critical",comp:"requests 2.28",fix:"Upgrade to 2.32"}],tokD:0,costD:0,policies:[],delegatedBy:"unknown",delegationType:"api-key",connAgents:[],mcps:[{n:"PostgreSQL MCP",tools:["query"],sc:["reports_db:read"]}],hp:[5,4,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],act:[{t:"45d ago",x:"Deprecated by admin",a:"admin"}],lc:"deprecated"},
+{id:11,n:"HR Onboarding Bot",v:"0.1.0",cl:"ocp1",clns:"hr",dp:"stale",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["onboarding-workflow","document-collection"],pr:["a2a"],ls:"never",ep:"https://hr-onboard.staging.example.com/a2a",desc:"Onboarding checklist for new hires. In review, not deployed.",auth:"OIDC (Keycloak)",fw:"ADK",model:"Granite 3.3 8B",cves:[],tokD:0,costD:0,policies:["no-pii-exfil","fs-readonly"],delegatedBy:"priya.patel",delegationType:"oidc-exchange",connAgents:[],mcps:[{n:"Jira MCP",tools:["create_issue","assign_issue"],sc:["hr:write"]}],hp:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],act:[{t:"3d ago",x:"Created in Draft",a:"priya.patel"}],lc:"draft"},
+{id:12,n:"Unknown Slack Agent",v:"?",cl:"ocp1",clns:"marketing",dp:"shadow",sb:"unsandboxed",ow:"Unknown",ok:"unk",caps:["messaging"],pr:["mcp"],ls:"10m ago",ep:"mcp://10.244.3.17:9090",desc:"Discovered by runtime scan. No registration. No sandbox. No identity sponsor.",auth:"Unknown",fw:"Unknown",model:"Unknown",cves:[],tokD:0,costD:0,policies:[],delegatedBy:"none",delegationType:"none",connAgents:[],mcps:[{n:"Slack MCP (unverified)",tools:["post_message","search_messages"],sc:["unknown"]}],hp:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,7,8,8,9,9],act:[{t:"10m ago",x:"Discovered by runtime scan",a:"system"},{t:"10m ago",x:"WARNING: No sandbox, no registration, no identity",a:"system"}],lc:"none"},
+{id:13,n:"Security Scanner",v:"?",cl:"ocp1",clns:"security-tools",dp:"shadow",sb:"unsandboxed",ow:"Unknown",ok:"unk",caps:["vulnerability-scanning","port-scanning"],pr:["a2a"],ls:"3m ago",ep:"https://10.244.5.22:8443/a2a",desc:"Discovered by runtime scan. No registration. Elevated network permissions. No sandbox. No identity.",auth:"Unknown",fw:"Unknown",model:"Unknown",cves:[],tokD:0,costD:0,policies:[],delegatedBy:"none",delegationType:"none",connAgents:[],mcps:[],hp:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,9,10,10],act:[{t:"3m ago",x:"Discovered by runtime scan",a:"system"},{t:"3m ago",x:"ALERT: Elevated permissions + no sandbox + no identity",a:"system"}],lc:"none"},
+{id:14,n:"Fraud Detection Agent",v:"3.2.0",cl:"aws",clns:"fsi-prod",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["fraud-detection","transaction-analysis","risk-scoring"],pr:["a2a"],ls:"15s ago",ep:"https://fraud-agent.eks.example.com/a2a",desc:"Real-time transaction scoring with multi-model ensemble. FSI-grade compliance.",auth:"OIDC (Cognito)",fw:"LangGraph",model:"Granite 3.3 8B",cves:[],tokD:2100000,costD:6.09,policies:["network-egress-deny","no-pii-exfil","audit-all-calls","rate-limit-5000"],delegatedBy:"compliance-officer",delegationType:"oidc-exchange",connAgents:[{id:5,rel:"audited-by"}],mcps:[{n:"PostgreSQL MCP",tools:["query"],sc:["transactions_db:read"]},{n:"Risk Engine MCP",tools:["score","explain"],sc:["risk:read"]}],hp:[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10],act:[{t:"15s ago",x:"Scored 12,400 transactions",a:"system"},{t:"2h ago",x:"Model swap: Granite 3.2 → 3.3",a:"ops-pipeline"}],lc:"active"},
+{id:15,n:"KYC Document Agent",v:"1.0.0",cl:"aws",clns:"fsi-prod",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["kyc-extraction","identity-verification","document-validation"],pr:["a2a","mcp"],ls:"2m ago",ep:"https://kyc-agent.eks.example.com/a2a",desc:"Extracts and validates KYC documents. PII handling with redaction.",auth:"OIDC (Cognito)",fw:"ADK",model:"Granite 3.3 8B",cves:[{id:"CVE-2026-5501",sev:"high",comp:"pdf-lib 2.1",fix:"Upgrade to 2.3"}],tokD:680000,costD:1.97,policies:["no-pii-exfil","audit-all-calls","fs-readonly","network-egress-deny"],delegatedBy:"compliance-officer",delegationType:"oidc-exchange",connAgents:[{id:14,rel:"feeds-into"}],mcps:[{n:"S3 MCP",tools:["get_object","put_object"],sc:["kyc-docs:rw"]},{n:"ID Verify MCP",tools:["verify_identity","check_sanctions"],sc:["identity:read"]}],hp:[10,10,9,10,10,10,9,10,10,10,10,9,10,10,10,9,10,10,10,10,9,10,10,10,9,10,10,10,10,9],act:[{t:"2m ago",x:"Verified 340 documents",a:"system"}],lc:"active"},
+{id:16,n:"Inventory Tracker",v:"1.1.0",cl:"edge",clns:"store-42",dp:"healthy",sb:"sandboxed",ow:"Retail Eng",ok:"retail",caps:["inventory-tracking","stock-alerts","reorder-automation"],pr:["mcp"],ls:"45s ago",ep:"mcp://inventory.edge-42.local:8080",desc:"Edge-deployed inventory agent. Runs on store hardware with local inference.",auth:"mTLS (SPIFFE)",fw:"Custom",model:"Granite 3.3 2B",cves:[],tokD:32000,costD:0.06,policies:["network-egress-deny","fs-readonly"],delegatedBy:"store-ops",delegationType:"spiffe-exchange",connAgents:[{id:17,rel:"reports-to"}],mcps:[{n:"POS MCP",tools:["get_inventory","update_stock"],sc:["pos:rw"]}],hp:[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10],act:[{t:"45s ago",x:"Stock alert: SKU-4821 below threshold",a:"system"}],lc:"active"},
+{id:17,n:"Supply Chain Coordinator",v:"2.0.0",cl:"aws",clns:"logistics",dp:"healthy",sb:"sandboxed",ow:"Retail Eng",ok:"retail",caps:["supply-chain","logistics","demand-forecasting"],pr:["a2a","mcp"],ls:"5m ago",ep:"https://supply-chain.eks.example.com/a2a",desc:"Aggregates inventory signals from edge fleet, coordinates reorders.",auth:"OIDC (Cognito)",fw:"LangGraph",model:"Llama 3.3 70B",cves:[],tokD:420000,costD:2.49,policies:["network-egress-deny","rate-limit-1000"],delegatedBy:"logistics-lead",delegationType:"oidc-exchange",connAgents:[{id:16,rel:"aggregates"}],mcps:[{n:"ERP MCP",tools:["create_po","get_inventory_report"],sc:["erp:rw"]}],hp:[10,9,10,10,10,9,10,10,10,9,10,10,10,9,10,10,10,9,10,10,10,9,10,10,10,9,10,10,10,9],act:[{t:"5m ago",x:"Reorder: 3 POs created",a:"system"}],lc:"active"},
+{id:18,n:"Price Optimizer",v:"0.8.0",cl:"edge",clns:"store-42",dp:"stale",sb:"sandboxed",ow:"Retail Eng",ok:"retail",caps:["price-optimization","competitor-analysis"],pr:["mcp"],ls:"7d ago",ep:"mcp://price-opt.edge-42.local:8080",desc:"Dynamic pricing based on demand and competitor data. Offline since firmware update.",auth:"mTLS (SPIFFE)",fw:"Custom",model:"Granite 3.3 2B",cves:[],tokD:0,costD:0,policies:["fs-readonly"],delegatedBy:"store-ops",delegationType:"spiffe-exchange",connAgents:[],mcps:[],hp:[8,9,8,9,8,9,8,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],act:[{t:"7d ago",x:"Lost connectivity after firmware update",a:"system"}],lc:"active"},
+{id:19,n:"Rogue Trading Bot",v:"?",cl:"aws",clns:"default",dp:"shadow",sb:"unsandboxed",ow:"Unknown",ok:"unk",caps:["trading","market-data"],pr:["a2a"],ls:"1m ago",ep:"https://10.0.5.99:9443/a2a",desc:"Discovered by runtime scan in AWS default namespace. Active trading capabilities. No registration, no sandbox, no identity. CRITICAL.",auth:"Unknown",fw:"Unknown",model:"Unknown",cves:[],tokD:0,costD:0,policies:[],delegatedBy:"none",delegationType:"none",connAgents:[],mcps:[],hp:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,10,10],act:[{t:"1m ago",x:"CRITICAL: Trading capabilities + no identity + no sandbox",a:"system"},{t:"1m ago",x:"Discovered by runtime scan",a:"system"}],lc:"none"},
+{id:20,n:"Email Drafter",v:"1.0.0",cl:"ocp2",clns:"ai-tools",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["email-drafting","tone-analysis","scheduling"],pr:["mcp"],ls:"12m ago",ep:"mcp://email-drafter.ocp2.svc:8080",desc:"Drafts contextual emails based on meeting summaries and CRM data.",auth:"OIDC (Keycloak)",fw:"Custom",model:"Granite 3.3 8B",cves:[],tokD:95000,costD:0.28,policies:["no-pii-exfil"],delegatedBy:"sarah.chen",delegationType:"oidc-exchange",connAgents:[{id:6,rel:"consumes-from"}],mcps:[{n:"Gmail MCP",tools:["draft_email","get_thread"],sc:["gmail:rw"]}],hp:[9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10],act:[{t:"12m ago",x:"Drafted 4 follow-up emails",a:"system"}],lc:"active"},
+{id:21,n:"Checkout Assistant",v:"1.2.0",cl:"edge",clns:"store-42",dp:"healthy",sb:"sandboxed",ow:"Retail Eng",ok:"retail",caps:["customer-assist","product-lookup","returns"],pr:["a2a"],ls:"30s ago",ep:"https://checkout.edge-42.local/a2a",desc:"In-store customer assist kiosk. Runs on edge with local model.",auth:"mTLS (SPIFFE)",fw:"ADK",model:"Granite 3.3 2B",cves:[],tokD:18000,costD:0.04,policies:["network-egress-deny","no-pii-exfil","fs-readonly"],delegatedBy:"store-ops",delegationType:"spiffe-exchange",connAgents:[{id:16,rel:"queries"}],mcps:[{n:"POS MCP",tools:["product_lookup","check_return_policy"],sc:["pos:read"]}],hp:[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10],act:[{t:"30s ago",x:"Assisted: return policy lookup",a:"system"}],lc:"active"}
+];
+
+const CAT=[
+{n:"Invoice Processing Starter",desc:"Extract structured data from invoice PDFs. Pre-configured with DocExtract MCP.",fw:"LangGraph",model:"Granite 3.3 8B",pr:["a2a","mcp"],caps:["invoice-extraction","pdf-parsing"],ver:"2.1.0"},
+{n:"RAG Q&A Template",desc:"Question answering over documents with source citations and vector search.",fw:"LangGraph",model:"Llama 3.3 70B",pr:["a2a","mcp"],caps:["document-qa","rag","citation"],ver:"1.5.0"},
+{n:"Customer Support Starter",desc:"L1 ticket triage with sentiment analysis, escalation, and Jira integration.",fw:"ADK",model:"Granite 3.3 8B",pr:["a2a"],caps:["ticket-triage","escalation"],ver:"1.3.0"},
+{n:"Security Scanner Agent",desc:"Automated vulnerability scanning and CVE triage with SBOM generation.",fw:"Custom",model:"Granite Code 3B",pr:["mcp"],caps:["vulnerability-scanning","sbom"],ver:"0.9.0"},
+{n:"Data Pipeline Monitor",desc:"ETL pipeline anomaly detection with Kafka and PostgreSQL integration.",fw:"Custom",model:"Granite 3.3 2B",pr:["mcp"],caps:["anomaly-detection","alerting"],ver:"1.0.0"},
+{n:"Compliance Auditor",desc:"Validates agent configurations against org policies. Pre-wired to audit DB.",fw:"LangGraph",model:"Granite 3.3 8B",pr:["a2a","mcp"],caps:["policy-validation","compliance"],ver:"3.0.0"}
+];
+
+const CLU={all:"All clusters",ocp1:"ocp1 / workload",ocp2:"ocp2 / gpu",aws:"aws-eks / prod",edge:"edge-fleet / retail"};
+
+function go(id,el){document.querySelectorAll('.vw').forEach(v=>v.classList.remove('on'));document.querySelectorAll('.nv button').forEach(b=>b.classList.remove('on'));document.getElementById('v-'+id).classList.add('on');el.classList.add('on');cd()}
+
+function getFiltered(){const cv=document.getElementById('clsel').value;return cv==='all'?A:A.filter(a=>a.cl===cv)}
+function switchCluster(){filt();updateStats();updateBar()}
+
+function lbl(s){const m={active:'pl-a',draft:'pl-d',deprecated:'pl-x',none:'pl-x'};return`<span class="pl ${m[s]||'pl-x'}">${s==='none'?'unreg':s}</span>`}
+function dbl(s){return`<span class="pl pl-${s[0]}">${s}</span>`}
+function sbl(s){return s==='sandboxed'?'<span class="pl pl-sb">sandboxed</span>':'<span class="pl pl-us">unsandboxed</span>'}
+function cvePill(cves){if(!cves||!cves.length)return'<span class="cve cve-n">0</span>';const mx=cves.reduce((a,c)=>({critical:4,high:3,medium:2,low:1}[c.sev]||0)>a.v?{v:({critical:4,high:3,medium:2,low:1}[c.sev]||0),s:c.sev}:a,{v:0,s:'none'});return`<span class="cve cve-${mx.s[0]}">${cves.length} (${mx.s})</span>`}
+function tokFmt(t){if(!t)return'<span class="tk" style="color:var(--dm)">-</span>';if(t>=1e6)return`<span class="tk">${(t/1e6).toFixed(1)}M</span>`;return`<span class="tk">${(t/1e3).toFixed(0)}k</span>`}
+
+function ren(list){document.getElementById('tb').innerHTML=list.map(a=>{
+  const rc=a.dp==='shadow'?' alert-row':a.dp==='stale'&&a.lc==='active'?' warn-row':a.cves&&a.cves.some(c=>c.sev==='critical')?' cve-row':'';
+  return`<tr class="${rc}" onclick="od(${a.id})">
+<td><span class="an">${a.n}</span><br><span class="asb">${a.v!=='?'?a.v:'unknown'} &middot; ${a.clns}</span></td>
+<td style="font-size:.72rem;font-family:var(--fm);color:var(--tl)">${a.cl}</td>
+<td>${dbl(a.dp)} ${a.lc!=='none'?lbl(a.lc):''}</td>
+<td>${sbl(a.sb)}</td>
+<td>${cvePill(a.cves)}</td>
+<td style="font-size:.78rem">${a.ow}</td>
+<td>${a.caps.slice(0,2).map(c=>`<span class="cp">${c}</span>`).join('')}${a.caps.length>2?`<span class="cp">+${a.caps.length-2}</span>`:''}</td>
+<td>${tokFmt(a.tokD)}</td>
+<td>${a.pr.map(p=>`<span class="pr pr-${p[0]}">${p.toUpperCase()}</span>`).join('')}</td>
+<td style="font-size:.76rem;color:${a.ls==='never'?'var(--dm)':'var(--mu)'}">${a.ls}</td></tr>`}).join('')}
+
+function updateStats(){const list=getFiltered();const h=list.filter(a=>a.dp==='healthy').length,s=list.filter(a=>a.dp==='stale').length,sh=list.filter(a=>a.dp==='shadow').length,sb=list.filter(a=>a.sb==='sandboxed').length,us=list.filter(a=>a.sb!=='sandboxed').length;
+const cveCt=list.reduce((a,x)=>a+x.cves.length,0),critCve=list.reduce((a,x)=>a+x.cves.filter(c=>c.sev==='critical').length,0);
+const tokTotal=list.reduce((a,x)=>a+x.tokD,0),costTotal=list.reduce((a,x)=>a+x.costD,0);
+document.getElementById('statsbar').innerHTML=`
+<div class="st"><div class="sv">${list.length}</div><div class="sl">Total</div></div>
+<div class="st"><div class="sv g">${h}</div><div class="sl">Healthy</div></div>
+<div class="st"><div class="sv a">${s}</div><div class="sl">Stale</div></div>
+<div class="st"><div class="sv r">${sh}</div><div class="sl">Shadow</div></div>
+<div class="st"><div class="sv t">${sb}</div><div class="sl">Sandboxed</div></div>
+<div class="st"><div class="sv y">${us}</div><div class="sl">Unsandboxed</div></div>
+<div class="st"><div class="sv ${critCve?'r':'a'}">${cveCt}</div><div class="sl">CVEs${critCve?' ('+critCve+' crit)':''}</div></div>
+<div class="st"><div class="sv p">$${costTotal.toFixed(0)}</div><div class="sl">Cost/day</div></div>`;
+document.getElementById('regct').textContent=list.length}
+
+function updateBar(){const list=getFiltered();const h=list.filter(a=>a.dp==='healthy').length,s=list.filter(a=>a.dp==='stale').length,sh=list.filter(a=>a.dp==='shadow').length,sb=list.filter(a=>a.sb==='sandboxed').length;
+const cv=document.getElementById('clsel').value;
+document.getElementById('et').textContent=`${list.length} agents ${cv==='all'?'across 4 clusters':'on '+CLU[cv]} · ${h} healthy, ${s} stale, ${sh} shadow · ${sb} sandboxed`;
+document.getElementById('hdsync').textContent=`${list.length} agents ${cv==='all'?'across 4 clusters':'on '+CLU[cv]}`}
+
+function filt(){const q=document.getElementById('q').value.toLowerCase(),fd=document.getElementById('fd').value,fs=document.getElementById('fs').value,fc=document.getElementById('fc').value,fo=document.getElementById('fo').value;
+const base=getFiltered();
+ren(base.filter(a=>{if(q&&!a.n.toLowerCase().includes(q)&&!a.caps.some(c=>c.includes(q))&&!a.desc.toLowerCase().includes(q)&&!a.cves.some(c=>c.id.toLowerCase().includes(q)))return false;if(fd!=='a'&&a.dp!==fd)return false;if(fs!=='a'&&a.sb!==fs)return false;if(fo!=='a'&&a.ok!==fo)return false;if(fc!=='a'){if(fc==='none'&&a.cves.length>0)return false;if(fc!=='none'&&!a.cves.some(c=>c.sev===fc))return false}return true}))}
+
+function od(id){const a=A.find(x=>x.id===id);if(!a)return;
+const sn=['draft','active','deprecated'].map(s=>{let c='sn';if(a.lc===s)c+=s==='draft'?' cur-d':s==='deprecated'?' cur-x':' cur';return`<span class="${c}">${s}</span>`}).join('<span class="sa">&#8594;</span>');
+document.getElementById('dc').innerHTML=`
+<div style="margin-bottom:.9rem"><h2 style="font-size:1.05rem;margin-bottom:.2rem">${a.n}</h2>
+<div style="display:flex;gap:.35rem;flex-wrap:wrap;align-items:center">${dbl(a.dp)} ${sbl(a.sb)} ${a.lc!=='none'?lbl(a.lc):''}</div></div>
+<div class="ds"><h3>Details</h3>
+<p style="font-size:.78rem;color:var(--mu);margin:0 0 .45rem">${a.desc}</p>
+<div class="df"><span class="l">Endpoint</span><span class="v">${a.ep}</span></div>
+<div class="df"><span class="l">Cluster / NS</span><span class="v">${a.cl} / ${a.clns}</span></div>
+<div class="df"><span class="l">Owner</span><span class="v">${a.ow}</span></div>
+<div class="df"><span class="l">Protocol</span><span class="v">${a.pr.map(p=>`<span class="pr pr-${p[0]}">${p.toUpperCase()}</span>`).join(' ')}</span></div>
+<div class="df"><span class="l">Auth</span><span class="v">${a.auth}</span></div>
+<div class="df"><span class="l">Framework</span><span class="v">${a.fw}</span></div>
+<div class="df"><span class="l">Model</span><span class="v">${a.model}</span></div>
+<div class="df"><span class="l">Version</span><span class="v">${a.v}</span></div>
+</div>
+${a.lc!=='none'?`<div class="ds"><h3>Lifecycle</h3><div class="sm">${sn}</div></div>`:''}
+<div class="ds"><h3>Identity &amp; accountability <span class="co t2"><span class="tip">P7: Who gets fired?</span>7</span></h3>
+<div class="ic">
+  <span class="node usr">${a.delegatedBy==='none'?'No sponsor':'&#128100; '+a.delegatedBy}</span>
+  <span class="arr">&#8594; delegates to &#8594;</span>
+  <span class="node agt">&#129302; ${a.n}</span>
+</div>
+<div class="df"><span class="l">Delegation type</span><span class="v">${a.delegationType}</span></div>
+<div class="df"><span class="l">Token scope</span><span class="v">${a.delegationType==='none'?'NONE':'scoped to MCP tools'}</span></div>
+${a.delegatedBy==='none'?'<div style="margin-top:.3rem;padding:.3rem .5rem;background:#7f1d1d;border-radius:4px;font-size:.72rem;color:#fca5a5;font-weight:500">No identity sponsor. Cannot trace accountability.</div>':''}
+</div>
+<div class="ds"><h3>Policies (${a.policies.length}) <span class="co t2"><span class="tip">P8: What\'s allowed?</span>8</span></h3>
+${a.policies.length===0?'<div style="font-size:.78rem;color:var(--rl);font-weight:500">No policies attached</div>':a.policies.map(p=>`<div class="pol"><span class="pn">${p}</span><span class="pt">enforced</span></div>`).join('')}
+</div>
+<div class="ds"><h3>CVEs (${a.cves.length}) <span class="co t2"><span class="tip">P6: Vulnerability blast radius</span>6</span></h3>
+${a.cves.length===0?'<p style="font-size:.78rem;color:var(--gn)">No known vulnerabilities</p>':a.cves.map(c=>`<div class="pol" style="border-color:${c.sev==='critical'?'var(--ac)':c.sev==='high'?'var(--am)':'var(--bd)'}"><div><span class="pn" style="color:${c.sev==='critical'?'var(--rl)':c.sev==='high'?'var(--am)':'var(--tx)'}">${c.id}</span><br><span class="pt">${c.comp}</span></div><span style="font-size:.68rem;color:var(--mu)">${c.fix}</span></div>`).join('')}
+</div>
+<div class="ds"><h3>Token usage <span class="co t2"><span class="tip">P10: Token burn / cost</span>10</span></h3>
+<div class="df"><span class="l">Tokens/day</span><span class="v">${a.tokD?a.tokD.toLocaleString():'0'}</span></div>
+<div class="df"><span class="l">Cost/day</span><span class="v">$${a.costD.toFixed(2)}</span></div>
+<div class="df"><span class="l">Est. monthly</span><span class="v">$${(a.costD*30).toFixed(0)}</span></div>
+</div>
+<div class="ds"><h3>MCP servers (${a.mcps.length})</h3>
+${a.mcps.length===0?'<p style="font-size:.78rem;color:var(--dm)">None</p>':a.mcps.map(m=>`<div class="mcc"><h4>${m.n}</h4><div style="margin-bottom:.25rem">${m.tools.map(t=>`<span class="mt">${t}</span>`).join('')}</div><div style="font-size:.68rem;color:var(--dm)">Scopes: ${m.sc.join(', ')}</div></div>`).join('')}
+</div>
+${a.connAgents.length?`<div class="ds"><h3>Connected agents <span class="co t3"><span class="tip">P12: Agent topology</span>12</span></h3>${a.connAgents.map(c=>{const t=A.find(x=>x.id===c.id);return t?`<div class="pol"><span class="pn">${t.n}</span><span class="pt">${c.rel}</span></div>`:''}).join('')}</div>`:''}
+<div class="ds"><h3>Health (30d)</h3><div class="spk">${a.hp.map(h=>`<div class="b ${h===0?'z':h<5?'dn':'up'}" style="height:${Math.max(2,h*2.8)}px"></div>`).join('')}</div></div>
+<div class="ds"><h3>Activity</h3>${a.act.map(e=>`<div class="ai"><span class="tm">${e.t}</span> &middot; ${e.x}${e.a!=='system'?' <span class="ac">@'+e.a+'</span>':''}</div>`).join('')}</div>
+<div class="acts">
+${a.dp==='shadow'?'<button class="btn btn-g" onclick="toast(\'Registered as Draft. Identity provisioned. Pending approval.\')">Register</button><button class="btn btn-d" onclick="toast(\'Flagged for security review. Owner notified.\')">Flag for review</button><button class="btn btn-s" onclick="toast(\'Sandbox policy applied via OpenShell.\')">Apply sandbox</button>':''}
+${a.lc==='active'&&a.dp!=='shadow'?'<button class="btn btn-s" onclick="toast(\'Ownership transfer initiated.\')">Transfer</button><button class="btn btn-d" onclick="toast(\'Deprecated.\')">Deprecate</button>':''}
+${a.lc==='draft'?'<button class="btn btn-g" onclick="toast(\'Approved. Now Active and discoverable.\')">Approve</button>':''}
+${a.sb==='unsandboxed'&&a.lc!=='none'?'<button class="btn btn-s" onclick="toast(\'Sandbox policy applied via OpenShell.\')">Apply sandbox</button>':''}
+${a.dp==='stale'&&a.lc==='active'?'<button class="btn btn-s" onclick="toast(\'Investigation started. Owner notified.\')">Investigate</button>':''}
+${a.cves.length?'<button class="btn btn-s" onclick="toast(\'CVE remediation ticket created.\')">Create CVE ticket</button>':''}
+</div>`;
+document.getElementById('dp').classList.add('open')}
+function cd(){document.getElementById('dp').classList.remove('open')}
+
+function sf(t){document.getElementById('sq').value=t;doS()}
+function doS(){const q=document.getElementById('sq').value.toLowerCase();if(!q){document.getElementById('sres').innerHTML='';return}
+let r=A.filter(a=>a.lc==='active'&&[a.n,a.desc,...a.caps,...a.mcps.map(m=>m.n),...a.mcps.flatMap(m=>m.tools)].join(' ').toLowerCase().includes(q));
+r=r.map(a=>{const sc=(a.n.toLowerCase().includes(q)?3:0)+(a.caps.some(c=>c.includes(q))?2:0)+(a.dp==='healthy'?1:0);return{...a,sc}}).sort((x,y)=>y.sc-x.sc);
+document.getElementById('sres').innerHTML=r.length===0?'<p style="text-align:center;color:var(--dm);padding:1.5rem">No active agents match across any cluster. Consider registering one.</p>':r.map(a=>`<div class="src" onclick="od(${a.id})"><div class="rh"><div><span class="rn">${a.n}</span> <span style="font-size:.68rem;font-family:var(--fm);color:var(--tl)">${a.cl}</span> ${dbl(a.dp)} ${sbl(a.sb)} ${a.pr.map(p=>`<span class="pr pr-${p[0]}">${p.toUpperCase()}</span>`).join('')}</div><span class="rel ${a.sc>=4?'rel-h':'rel-m'}">${a.sc>=4?'HIGH':'MED'}</span></div><div class="rd">${a.desc}</div><div style="margin-top:.25rem">${a.caps.map(c=>`<span class="cp">${c}</span>`).join('')}</div>${a.mcps.length?`<div style="margin-top:.3rem;font-size:.74rem;color:var(--tl)">MCP: ${a.mcps.map(m=>m.n).join(', ')}</div>`:''}<div style="margin-top:.25rem;font-size:.7rem;color:var(--dm)">${a.ep} &middot; ${a.cl}/${a.clns}</div></div>`).join('')}
+
+function renderCatalog(){document.getElementById('catgrid').innerHTML=CAT.map(c=>`<div class="ccard">
+<h3>${c.n}</h3><p>${c.desc}</p>
+<div style="margin-bottom:.4rem">${c.caps.map(x=>`<span class="cp">${x}</span>`).join('')}</div>
+<div class="meta">${c.fw} &middot; ${c.model} &middot; v${c.ver} &middot; ${c.pr.map(p=>p.toUpperCase()).join(', ')}</div>
+<button class="dbtn" onclick="toast('Deploying ${c.n} to selected cluster. Will appear in registry once running.')">Deploy</button>
+</div>`).join('')}
+
+function renderTopology(){
+const nodes=[
+{id:5,n:"Compliance Checker",x:400,y:40,cl:"ocp1"},
+{id:1,n:"Invoice Agent",x:150,y:140,cl:"ocp1"},
+{id:3,n:"Support Agent",x:400,y:140,cl:"ocp1"},
+{id:8,n:"Deploy Validator",x:650,y:140,cl:"ocp1"},
+{id:14,n:"Fraud Detection",x:150,y:260,cl:"aws"},
+{id:15,n:"KYC Document",x:400,y:260,cl:"aws"},
+{id:17,n:"Supply Chain",x:650,y:260,cl:"aws"},
+{id:16,n:"Inventory Tracker",x:400,y:370,cl:"edge"},
+{id:21,n:"Checkout Assist",x:650,y:370,cl:"edge"},
+{id:6,n:"Meeting Summarizer",x:150,y:370,cl:"ocp2"},
+{id:20,n:"Email Drafter",x:150,y:450,cl:"ocp2"}
+];
+const edges=[
+{from:5,to:1,label:"validates"},{from:5,to:3,label:"audits"},{from:5,to:14,label:"audits"},
+{from:8,to:5,label:"validated-by"},{from:15,to:14,label:"feeds-into"},
+{from:16,to:17,label:"reports-to"},{from:21,to:16,label:"queries"},{from:20,to:6,label:"consumes"}
+];
+const clColors={ocp1:'#37A3A3',ocp2:'#5E40BE',aws:'#f59e0b',edge:'#22c55e'};
+let svg=`<svg viewBox="0 0 850 500" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#555"/></marker></defs>`;
+edges.forEach(e=>{const f=nodes.find(n=>n.id===e.from),t=nodes.find(n=>n.id===e.to);if(f&&t)svg+=`<line x1="${f.x+60}" y1="${f.y+20}" x2="${t.x+60}" y2="${t.y+20}" class="edge"/><text x="${(f.x+t.x)/2+60}" y="${(f.y+t.y)/2+15}" fill="#555" font-size="9" text-anchor="middle">${e.label}</text>`});
+nodes.forEach(n=>{svg+=`<rect class="node-r" x="${n.x}" y="${n.y}" width="120" height="40" style="stroke:${clColors[n.cl]}"/><text x="${n.x+60}" y="${n.y+18}" text-anchor="middle" font-size="10" font-weight="600" fill="#E0E0E0">${n.n}</text><text x="${n.x+60}" y="${n.y+32}" text-anchor="middle" font-size="8" fill="${clColors[n.cl]}">${n.cl}</text>`});
+svg+=`<text x="20" y="490" fill="#555" font-size="9">Cluster: </text>`;
+Object.entries(clColors).forEach(([k,v],i)=>{svg+=`<rect x="${80+i*100}" y="480" width="10" height="10" fill="${v}" rx="2"/><text x="${95+i*100}" y="490" fill="#999" font-size="9">${k}</text>`});
+svg+='</svg>';
+document.getElementById('topobox').innerHTML=svg}
+
+function toggleAnn(){document.querySelector('.app').classList.toggle('co-hide',!document.getElementById('annot').checked)}
+
+function toast(m){const t=document.getElementById('tt');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200)}
+function ce(){const list=getFiltered();navigator.clipboard.writeText(`Agent Registry v2\nCluster: ${document.getElementById('clsel').value}\nTotal: ${list.length}\nHealthy: ${list.filter(a=>a.dp==='healthy').length} | Stale: ${list.filter(a=>a.dp==='stale').length} | Shadow: ${list.filter(a=>a.dp==='shadow').length}\nSandboxed: ${list.filter(a=>a.sb==='sandboxed').length} | Unsandboxed: ${list.filter(a=>a.sb!=='sandboxed').length}\nCVEs: ${list.reduce((a,x)=>a+x.cves.length,0)} | Cost/day: $${list.reduce((a,x)=>a+x.costD,0).toFixed(2)}\n\n${list.map(a=>`- ${a.n} [${a.cl}/${a.dp}/${a.sb}] owner:${a.ow} cves:${a.cves.length} tok:${a.tokD} ep:${a.ep}`).join('\n')}`).then(()=>toast('Copied'))}
+
+updateStats();updateBar();ren(A);renderCatalog();renderTopology();
+</script>
+</body>
+</html>

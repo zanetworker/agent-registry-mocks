@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Registry v1 (Tier 1)</title>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700;900&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#000;--p:#0a0a0a;--p2:#111;--bd:#292929;--tx:#E0E0E0;--mu:#A3A3A3;--dm:#4D4D4D;--ac:#EE0000;--ah:#A60000;--pu:#5E40BE;--pd:#21134D;--tl:#37A3A3;--tll:#9AD8D8;--td:#004D4D;--gn:#22c55e;--gd:#22c55e20;--am:#f59e0b;--ad:#f59e0b20;--rl:#F56E6E;--fd:'Red Hat Display',Arial,sans-serif;--ft:'Red Hat Text',Arial,sans-serif;--fm:'Red Hat Mono','Courier New',monospace}
+body{font-family:var(--ft);background:var(--bg);color:var(--tx);line-height:1.5;padding-bottom:56px}
+h1,h2,h3{font-family:var(--fd);font-weight:700}
+.app{max-width:1480px;margin:0 auto;padding:1.5rem}
+.hd{display:flex;align-items:center;justify-content:space-between;padding-bottom:1.2rem;border-bottom:2px solid var(--ac);margin-bottom:1.4rem}
+.hd h1{font-size:1.45rem;letter-spacing:-.02em}.hd h1 span{color:var(--ac)}
+.hd-m{font-size:.78rem;color:var(--mu);font-family:var(--fm)}
+.nv{display:flex;gap:.35rem;margin-bottom:1.4rem;flex-wrap:wrap}
+.nv button{background:var(--p);border:1px solid var(--bd);color:var(--mu);padding:.48rem 1.1rem;border-radius:6px;cursor:pointer;font-size:.82rem;font-family:var(--ft);font-weight:500;transition:all .2s;position:relative}
+.nv button:hover{border-color:#444;color:var(--tx)}.nv button.on{border-color:var(--ac);color:#fff;background:#1a0000}
+.nv .bg{position:absolute;top:-6px;right:-6px;font-size:.63rem;padding:1px 5px;border-radius:8px;font-weight:700;color:#fff}
+.bg-r{background:var(--ac)}.bg-a{background:var(--am)}.bg-g{background:var(--gn)}
+.vw{display:none;animation:fi .22s ease}.vw.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.sts{display:flex;gap:.85rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.st{background:var(--p);border:1px solid var(--bd);border-radius:8px;padding:.65rem 1.1rem;flex:1;min-width:100px}
+.sv{font-size:1.5rem;font-weight:700;font-family:var(--fd)}.sl{font-size:.68rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-top:1px}
+.sv.g{color:var(--gn)}.sv.a{color:var(--am)}.sv.r{color:var(--rl)}.sv.t{color:var(--tl)}.sv.y{color:#fbbf24}
+.fb{display:flex;gap:.45rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.fb input[type=text]{background:var(--p);border:1px solid var(--bd);color:var(--tx);padding:.48rem .7rem;border-radius:6px;font-size:.84rem;flex:1;min-width:190px;font-family:var(--ft)}
+.fb input::placeholder{color:var(--dm)}
+.fb select{background:var(--p);border:1px solid var(--bd);color:var(--mu);padding:.48rem .7rem;border-radius:6px;font-size:.8rem;font-family:var(--ft);cursor:pointer}
+.fb select:focus,.fb input:focus{outline:none;border-color:var(--ac)}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+thead th{text-align:left;padding:.55rem .65rem;border-bottom:2px solid var(--ac);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);font-weight:600;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}tbody tr:hover{background:#111}
+td{padding:.55rem .65rem;vertical-align:middle}
+.an{font-weight:600;color:#fff}.asb{font-size:.7rem;color:var(--dm)}
+.pl{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.pl-a{background:#22c55e20;color:#22c55e;border:1px solid #22c55e40}.pl-d{background:#5E40BE20;color:#a78bfa;border:1px solid #5E40BE40}.pl-x{background:#6b728020;color:#9ca3af;border:1px solid #6b728040}
+.pl-h{background:var(--gd);color:var(--gn);border:1px solid #22c55e40}.pl-s{background:var(--ad);color:var(--am);border:1px solid #f59e0b40}.pl-w{background:#EE000020;color:var(--rl);border:1px solid #EE000040}
+.pl-sb{background:var(--td);color:var(--tll);border:1px solid #00666640;font-size:.65rem}.pl-us{background:#3d240620;color:#fbbf24;border:1px solid #f59e0b30;font-size:.65rem}
+.pr{display:inline-block;padding:1px 5px;border-radius:3px;font-size:.63rem;font-family:var(--fm);font-weight:500;margin-right:2px}
+.pr-m{background:var(--td);color:var(--tll)}.pr-a{background:var(--pd);color:#c4b5fd}
+.cp{display:inline-block;padding:1px 5px;border-radius:3px;font-size:.68rem;background:var(--p2);border:1px solid var(--bd);color:var(--mu);margin:1px 1px}
+.mc{font-family:var(--fm);color:var(--tl);font-size:.8rem}
+/* Detail */
+.dp{position:fixed;top:0;right:0;width:540px;height:100vh;background:var(--p);border-left:1px solid var(--bd);z-index:100;overflow-y:auto;padding:1.5rem;transform:translateX(100%);transition:transform .22s ease}.dp.open{transform:translateX(0)}
+.dp .x{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--mu);cursor:pointer;font-size:1.2rem}.dp .x:hover{color:#fff}
+.ds{margin-bottom:1.15rem}.ds h3{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--mu);margin-bottom:.45rem;font-weight:600}
+.df{display:flex;justify-content:space-between;padding:.25rem 0;border-bottom:1px solid #1a1a1a}.df .l{color:var(--mu);font-size:.8rem}.df .v{color:#fff;font-size:.8rem;font-family:var(--fm);text-align:right;max-width:290px;word-break:break-all}
+.sm{display:flex;align-items:center;gap:.45rem;margin:.65rem 0}.sn{padding:.25rem .6rem;border-radius:5px;font-size:.73rem;font-weight:600;border:1px solid var(--bd);color:var(--mu);background:var(--p2)}
+.sn.cur{border-color:var(--gn);color:var(--gn);background:#22c55e12}.sn.cur-d{border-color:var(--pu);color:#a78bfa;background:#5E40BE12}.sn.cur-x{border-color:#6b7280;color:#9ca3af;background:#6b728012}
+.sa{color:var(--dm);font-size:.78rem}
+.mcc{background:var(--p2);border:1px solid var(--bd);border-radius:7px;padding:.65rem;margin-bottom:.45rem}
+.mcc h4{font-size:.83rem;color:var(--tl);font-weight:600;margin-bottom:.35rem}
+.mt{display:inline-block;padding:1px 5px;border-radius:3px;font-size:.68rem;font-family:var(--fm);background:#111;border:1px solid var(--bd);color:var(--mu);margin:1px}
+.spk{display:flex;align-items:end;gap:1px;height:28px;margin:.4rem 0}.spk .b{width:4px;border-radius:1px;min-height:2px}.b.up{background:var(--gn)}.b.dn{background:var(--am)}.b.z{background:var(--dm)}
+.ai{padding:.35rem 0;border-bottom:1px solid #1a1a1a;font-size:.78rem}.ai .tm{color:var(--dm);font-size:.7rem;font-family:var(--fm)}.ai .ac{color:var(--tll)}
+.acts{display:flex;gap:.4rem;margin-top:.9rem;flex-wrap:wrap}
+.btn{padding:.38rem .85rem;border-radius:5px;font-size:.78rem;cursor:pointer;font-family:var(--ft);font-weight:500;transition:all .2s;border:1px solid var(--bd)}
+.btn-p{background:var(--ac);border-color:var(--ac);color:#fff}.btn-p:hover{background:var(--ah)}
+.btn-s{background:var(--p2);color:var(--tx)}.btn-s:hover{border-color:#444}
+.btn-d{background:#7f1d1d;border-color:#991b1b;color:#fca5a5}.btn-d:hover{background:#991b1b}
+.btn-g{background:#14532d;border-color:#166534;color:#86efac}.btn-g:hover{background:#166534}
+/* Search */
+.sh{text-align:center;padding:1.8rem 0}.sh h2{font-size:1.4rem;margin-bottom:.4rem}.sh p{color:var(--mu);margin-bottom:1.1rem}
+.siw{max-width:580px;margin:0 auto}.siw input{width:100%;background:var(--p);border:1px solid var(--bd);color:var(--tx);padding:.7rem .9rem;border-radius:7px;font-size:.95rem;font-family:var(--ft)}.siw input:focus{outline:none;border-color:var(--ac)}
+.ssg{display:flex;gap:.4rem;justify-content:center;margin-top:.65rem;flex-wrap:wrap}
+.ssg span{padding:.25rem .6rem;border-radius:14px;font-size:.73rem;cursor:pointer;background:var(--p2);border:1px solid var(--bd);color:var(--mu);transition:all .2s}.ssg span:hover{border-color:var(--ac);color:var(--tx)}
+.sr{margin-top:1.3rem}
+.src{background:var(--p);border:1px solid var(--bd);border-radius:9px;padding:.9rem 1.1rem;margin-bottom:.65rem;cursor:pointer;transition:all .15s}.src:hover{border-color:#444}
+.src .rh{display:flex;justify-content:space-between;align-items:center}.src .rn{font-weight:600;color:#fff;font-size:.92rem}.src .rd{color:var(--mu);font-size:.8rem;margin:.25rem 0}
+.rel{display:inline-block;padding:1px 7px;border-radius:3px;font-size:.68rem;font-weight:600;font-family:var(--fm)}
+.rel-h{background:#22c55e20;color:#22c55e}.rel-m{background:#f59e0b20;color:#f59e0b}
+/* Register */
+.rf{background:var(--p);border:1px solid var(--bd);border-radius:9px;padding:1.3rem;margin-top:.9rem}
+.fg{margin-bottom:.85rem}.fg label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);margin-bottom:.3rem;font-weight:600}
+.fg input,.fg select{width:100%;background:var(--p2);border:1px solid var(--bd);color:var(--tx);padding:.48rem .7rem;border-radius:5px;font-size:.84rem;font-family:var(--ft)}.fg input:focus{outline:none;border-color:var(--ac)}
+/* Tier labels */
+.tier{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .5rem;border-radius:3px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+.t1{background:#22c55e10;color:var(--gn);border:1px solid #22c55e30}.t2{background:#f59e0b10;color:var(--am);border:1px solid #f59e0b30}.t3{background:#6b728010;color:#9ca3af;border:1px solid #6b728030}
+.toast{position:fixed;bottom:72px;right:2rem;background:var(--gn);color:#000;padding:.55rem 1.1rem;border-radius:7px;font-weight:600;font-size:.83rem;transform:translateY(90px);opacity:0;transition:all .25s;z-index:200}.toast.show{transform:translateY(0);opacity:1}
+.pov{background:var(--p);border:1px solid var(--bd);border-radius:8px;margin-bottom:1rem;padding:.65rem 1rem;overflow:hidden}
+.pov h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);font-weight:600;margin-bottom:.4rem}
+.pov-g{margin-bottom:.35rem}.pov-g h4{font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.25rem;font-weight:700}
+.pov-g.t1 h4{color:var(--ac)}.pov-g.t2 h4{color:var(--am)}.pov-g.t3 h4{color:var(--dm)}
+.pib{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .5rem;border-radius:4px;font-size:.66rem;margin:2px;border:1px solid var(--bd);background:var(--p2);color:var(--mu)}
+.pib.on{border-color:var(--gn);color:var(--gn);background:#22c55e08}.pib.off{border-color:var(--bd);color:var(--dm);opacity:.5;text-decoration:line-through}
+.ebar{position:fixed;bottom:0;left:0;right:0;background:var(--p);border-top:1px solid var(--bd);padding:.65rem 1.8rem;display:flex;align-items:center;justify-content:space-between;z-index:50}
+.ebar .et{font-size:.8rem;color:var(--mu);flex:1;margin-right:.8rem;font-family:var(--fm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ebar button{background:var(--ac);border:none;color:#fff;padding:.45rem 1.1rem;border-radius:5px;cursor:pointer;font-family:var(--ft);font-weight:600;font-size:.8rem}.ebar button:hover{background:var(--ah)}
+.alert-row{background:#1a0505!important;border-left:3px solid var(--ac)!important}
+.warn-row{background:#1a1005!important;border-left:3px solid var(--am)!important}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hd"><h1><span>Agent</span> Registry <sup style="font-size:.55rem;color:var(--dm);font-weight:400">v1</sup></h1><div class="hd-m">13 agents &middot; Last sync 2m ago</div></div>
+
+<!-- Problem annotations -->
+<div class="pov">
+<h3>Problems solved by this mock (v1: Tier 1 only)</h3>
+<div class="pov-g t1"><h4>Tier 1: Core (solved)</h4>
+  <span class="pib on">P1 Duplicate agents across teams</span>
+  <span class="pib on">P2 What's running where?</span>
+  <span class="pib on">P3 Is it safe? (sandbox + health)</span>
+  <span class="pib on">P4 Shadow IT for agents</span>
+  <span class="pib on">P5 Where do I route?</span>
+</div>
+<div class="pov-g t2"><h4>Tier 2: Governance (not solved)</h4>
+  <span class="pib off">P6 Vulnerability blast radius</span>
+  <span class="pib off">P7 Who gets fired? (accountability)</span>
+  <span class="pib off">P8 What's allowed? (policy)</span>
+  <span class="pib off">P9 Cross-cluster blind spots</span>
+  <span class="pib off">P10 Token burn / cost</span>
+</div>
+<div class="pov-g t3"><h4>Tier 3: Scale (not solved)</h4>
+  <span class="pib off">P11 Catalog vs Registry confusion</span>
+  <span class="pib off">P12 Agent sprawl (topology)</span>
+  <span class="pib off">P13 CMDB integration</span>
+  <span class="pib off">P14 API-first (programmatic)</span>
+</div>
+</div>
+<div class="nv">
+  <button class="on" onclick="go('reg',this)">Registry<span class="bg bg-g">13</span></button>
+  <button onclick="go('sea',this)">Search</button>
+  <button onclick="go('add',this)">Register</button>
+</div>
+
+<!-- REGISTRY (Tier 1: the core product) -->
+<div id="v-reg" class="vw on">
+<div class="tier t1">Tier 1 &middot; Pull &middot; "What do we have? Is it safe? Where do I route?"</div>
+<div class="sts">
+  <div class="st"><div class="sv">13</div><div class="sl">Total</div></div>
+  <div class="st"><div class="sv g">8</div><div class="sl">Healthy</div></div>
+  <div class="st"><div class="sv a">3</div><div class="sl">Stale</div></div>
+  <div class="st"><div class="sv r">2</div><div class="sl">Shadow</div></div>
+  <div class="st"><div class="sv t">9</div><div class="sl">Sandboxed</div></div>
+  <div class="st"><div class="sv y">4</div><div class="sl">Unsandboxed</div></div>
+</div>
+<div class="fb">
+  <input type="text" id="q" placeholder="Search by name or capability..." oninput="filt()">
+  <select id="fd" onchange="filt()"><option value="a">All deployment</option><option value="healthy">Healthy</option><option value="stale">Stale</option><option value="shadow">Shadow</option></select>
+  <select id="fs" onchange="filt()"><option value="a">All sandbox</option><option value="sandboxed">Sandboxed</option><option value="unsandboxed">Unsandboxed</option></select>
+  <select id="fo" onchange="filt()"><option value="a">All owners</option><option value="ai">AI Team</option><option value="plat">Platform Team</option><option value="devops">DevOps</option><option value="unk">Unknown</option></select>
+</div>
+<div style="overflow-x:auto">
+<table><thead><tr><th>Agent</th><th>Deployment</th><th>Sandbox</th><th>Owner</th><th>Capabilities</th><th>Endpoint</th><th>Protocol</th><th>Last seen</th></tr></thead>
+<tbody id="tb"></tbody></table>
+</div>
+</div>
+
+<!-- SEARCH (Tier 1: find before you build) -->
+<div id="v-sea" class="vw">
+<div class="tier t1">Tier 1 &middot; Pull &middot; "Three teams built the same thing"</div>
+<div class="sh">
+  <h2>Find agents by capability</h2>
+  <p>Search before you build. Discover what already exists.</p>
+  <div class="siw"><input type="text" id="sq" placeholder="Find agents that can..." oninput="doS()"></div>
+  <div class="ssg">
+    <span onclick="sf('process invoices')">process invoices</span>
+    <span onclick="sf('review code')">review code</span>
+    <span onclick="sf('customer support')">customer support</span>
+    <span onclick="sf('monitor pipeline')">monitor pipeline</span>
+    <span onclick="sf('security')">security</span>
+    <span onclick="sf('summarize')">summarize</span>
+  </div>
+</div>
+<div id="sres" class="sr"></div>
+</div>
+
+<!-- REGISTER (Tier 2: manual registration) -->
+<div id="v-add" class="vw">
+<div class="tier t2">Tier 2 &middot; Moderate pull &middot; Manual registration</div>
+<h2 style="margin-bottom:.25rem">Register an agent</h2>
+<p style="color:var(--mu);font-size:.88rem;margin-bottom:.8rem">Bring an existing agent under governance.</p>
+<div class="rf">
+  <div class="fg"><label>Agent name</label><input type="text" placeholder="Invoice Processing Agent"></div>
+  <div class="fg"><label>Description</label><input type="text" placeholder="What does this agent do?"></div>
+  <div class="fg"><label>Endpoint URL</label><input type="text" placeholder="https://agent.example.com/a2a or mcp://..."></div>
+  <div class="fg"><label>Cluster / Namespace</label><input type="text" placeholder="prod / agents"></div>
+  <div class="fg"><label>Owner</label><select><option>AI Team</option><option>Platform Team</option><option>DevOps</option></select></div>
+  <div class="fg"><label>Protocol</label><select><option>A2A</option><option>MCP</option><option>Both</option></select></div>
+  <div class="fg"><label>Capabilities (comma separated)</label><input type="text" placeholder="invoice-extraction, pdf-parsing, data-validation"></div>
+  <div class="fg"><label>Sandbox state</label><select><option>Sandboxed</option><option>Unsandboxed</option></select></div>
+  <div style="margin-top:.5rem"><button class="btn btn-g" onclick="toast('Agent registered as Draft. Visible in registry once approved.')">Register as Draft</button></div>
+</div>
+</div>
+</div>
+
+<div class="dp" id="dp"><button class="x" onclick="cd()">&times;</button><div id="dc"></div></div>
+<div class="toast" id="tt"></div>
+<div class="ebar"><span class="et" id="et">13 agents &middot; 8 healthy, 3 stale, 2 shadow &middot; 9 sandboxed, 4 unsandboxed</span><button onclick="ce()">Copy summary</button></div>
+
+<script>
+const A=[
+{id:1,n:"Invoice Processing Agent",v:"2.1.0",lc:"active",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["invoice-extraction","pdf-parsing","data-validation"],pr:["a2a","mcp"],ls:"2m ago",ep:"https://invoice-agent.apps.ocp1.example.com/a2a",cl:"ocp1 / agents",desc:"Extracts structured data from invoice PDFs, validates against schema, writes to accounting system.",auth:"OIDC (Keycloak)",fw:"LangGraph",model:"Granite 3.3 8B",mcps:[{n:"PostgreSQL MCP",tools:["query","insert","update","list_tables"],sc:["invoices_db:rw"]},{n:"DocExtract MCP",tools:["extract_pdf","ocr"],sc:["documents:read"]}],hp:[8,9,7,10,9,8,10,9,8,7,9,10,8,9,10,8,7,9,10,9,8,10,9,8,7,9,10,8,9,10],act:[{t:"2h ago",x:"Health check passed",a:"system"},{t:"1d ago",x:"Version 2.0.3 to 2.1.0",a:"sarah.chen"}]},
+{id:2,n:"Sales Research Agent",v:"2.0.1",lc:"active",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["lead-research","company-analysis","market-intel"],pr:["a2a","mcp"],ls:"5m ago",ep:"https://sales-research.apps.ocp1.example.com/a2a",cl:"ocp1 / agents",desc:"Researches prospects from web data and CRM history. Produces briefing documents.",auth:"OIDC (Keycloak)",fw:"CrewAI",model:"Llama 3.3 70B",mcps:[{n:"Web Search MCP",tools:["search","fetch_page"],sc:["web:read"]},{n:"CRM MCP",tools:["get_contact","get_company","list_opps"],sc:["crm:read"]}],hp:[9,10,8,9,10,9,8,10,9,10,8,9,10,9,8,10,9,10,8,9,10,9,8,10,9,10,8,9,10,9],act:[{t:"5m ago",x:"Task: lead briefing complete",a:"system"}]},
+{id:3,n:"Customer Support Agent",v:"1.3.0",lc:"active",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["ticket-triage","sentiment-analysis","escalation"],pr:["a2a"],ls:"1m ago",ep:"https://support-agent.apps.ocp1.example.com/a2a",cl:"ocp1 / agents",desc:"L1 support tickets. Multi-turn conversation with automatic escalation and sentiment tracking.",auth:"OIDC (Keycloak)",fw:"ADK",model:"Granite 3.3 8B",mcps:[{n:"Jira MCP",tools:["create_issue","update_issue","add_comment"],sc:["jira:rw"]},{n:"Slack MCP",tools:["post_message","get_thread"],sc:["slack:rw"]}],hp:[10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,10],act:[{t:"1m ago",x:"Ticket resolved SUPPORT-4521",a:"system"}]},
+{id:4,n:"Data Pipeline Monitor",v:"1.0.2",lc:"active",dp:"healthy",sb:"sandboxed",ow:"DevOps",ok:"devops",caps:["pipeline-monitoring","anomaly-detection","alerting"],pr:["mcp"],ls:"30s ago",ep:"mcp://pipeline-monitor.agents.svc:8080",cl:"ocp1 / monitoring",desc:"Monitors ETL pipelines for anomalies, routes alerts, suggests remediation.",auth:"mTLS (SPIFFE)",fw:"Custom",model:"Granite 3.3 2B",mcps:[{n:"Kafka MCP",tools:["list_topics","get_consumer_lag"],sc:["kafka:read"]},{n:"PostgreSQL MCP",tools:["query"],sc:["metrics_db:read"]}],hp:[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10],act:[{t:"30s ago",x:"Health check passed",a:"system"},{t:"4h ago",x:"Anomaly: pipeline-orders lag spike",a:"system"}]},
+{id:5,n:"Compliance Checker",v:"3.1.0",lc:"active",dp:"healthy",sb:"sandboxed",ow:"Platform Team",ok:"plat",caps:["policy-validation","audit-logging","compliance-reporting"],pr:["a2a","mcp"],ls:"3m ago",ep:"https://compliance.apps.ocp1.example.com/a2a",cl:"ocp1 / platform",desc:"Validates agent configurations against org policies. Generates compliance reports.",auth:"OIDC (Keycloak)",fw:"LangGraph",model:"Granite 3.3 8B",mcps:[{n:"PostgreSQL MCP",tools:["query"],sc:["audit_db:read"]}],hp:[9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10],act:[{t:"3m ago",x:"Scan: 12 agents, 0 violations",a:"system"}]},
+{id:6,n:"Meeting Summarizer",v:"1.1.0",lc:"active",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["transcription","summarization","action-items"],pr:["mcp"],ls:"20m ago",ep:"mcp://meeting-sum.agents.svc:8080",cl:"ocp1 / agents",desc:"Processes recordings, generates summaries with action items.",auth:"mTLS (SPIFFE)",fw:"Custom",model:"Granite 3.3 8B",mcps:[{n:"S3 MCP",tools:["get_object","put_object"],sc:["recordings:read","summaries:write"]}],hp:[8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10,8,9,10],act:[{t:"20m ago",x:"Summarized Q3 Planning Sync",a:"system"}]},
+{id:7,n:"Doc QA Agent",v:"1.5.2",lc:"active",dp:"healthy",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["document-qa","rag","source-citation"],pr:["a2a","mcp"],ls:"8m ago",ep:"https://doc-qa.apps.ocp1.example.com/a2a",cl:"ocp1 / agents",desc:"RAG question answering over internal docs with source citations.",auth:"OIDC (Keycloak)",fw:"LangGraph",model:"Llama 3.3 70B",mcps:[{n:"PostgreSQL MCP",tools:["query","vector_search"],sc:["docs_db:read"]},{n:"S3 MCP",tools:["get_object"],sc:["documents:read"]}],hp:[10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10,10,9,10],act:[{t:"8m ago",x:"Query: 'How do I configure mTLS?'",a:"system"}]},
+{id:8,n:"Deployment Validator",v:"0.9.1",lc:"active",dp:"healthy",sb:"unsandboxed",ow:"Platform Team",ok:"plat",caps:["manifest-validation","image-scanning","resource-checks"],pr:["mcp"],ls:"1m ago",ep:"mcp://deploy-val.platform.svc:8080",cl:"ocp1 / platform",desc:"Pre-deploy validation: K8s manifests, image scans, resource limits. Needs cluster-wide read.",auth:"mTLS (SPIFFE)",fw:"Custom",model:"Granite Code 3B",mcps:[{n:"GitHub MCP",tools:["get_file","get_pr","get_diff"],sc:["repos:read"]}],hp:[10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10],act:[{t:"1m ago",x:"Validated: orders-service v2.3.1",a:"system"}]},
+{id:9,n:"Code Review Agent",v:"1.2.0",lc:"active",dp:"stale",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["code-review","security-analysis","style-checking"],pr:["a2a","mcp"],ls:"14 days ago",ep:"https://code-review.apps.ocp1.example.com/a2a",cl:"ocp1 / agents",desc:"Automated PR review. Not responding since 14 days.",auth:"OIDC (Keycloak)",fw:"LangGraph",model:"Granite Code 3B",mcps:[{n:"GitHub MCP",tools:["get_pr","get_diff","post_review"],sc:["repos:rw"]}],hp:[10,9,10,8,9,7,5,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],act:[{t:"14d ago",x:"Last health check passed",a:"system"},{t:"14d ago",x:"Last review: orders-service #847",a:"system"}]},
+{id:10,n:"Legacy Report Generator",v:"0.5.0",lc:"deprecated",dp:"stale",sb:"unsandboxed",ow:"DevOps",ok:"devops",caps:["report-generation","data-aggregation"],pr:["mcp"],ls:"45 days ago",ep:"mcp://legacy-reports.agents.svc:8080",cl:"ocp1 / reporting",desc:"Deprecated. Replaced by Data Pipeline Monitor.",auth:"API Key",fw:"Custom",model:"GPT-4o (external)",mcps:[{n:"PostgreSQL MCP",tools:["query"],sc:["reports_db:read"]}],hp:[5,4,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],act:[{t:"45d ago",x:"Deprecated by admin",a:"admin"}]},
+{id:11,n:"HR Onboarding Bot",v:"0.1.0",lc:"draft",dp:"stale",sb:"sandboxed",ow:"AI Team",ok:"ai",caps:["onboarding-workflow","document-collection"],pr:["a2a"],ls:"never",ep:"https://hr-onboard.staging.example.com/a2a",cl:"staging / hr",desc:"Onboarding checklist for new hires. In review, not deployed.",auth:"OIDC (Keycloak)",fw:"ADK",model:"Granite 3.3 8B",mcps:[{n:"Jira MCP",tools:["create_issue","assign_issue"],sc:["hr:write"]},{n:"Slack MCP",tools:["send_dm"],sc:["slack:write"]}],hp:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],act:[{t:"3d ago",x:"Created in Draft",a:"priya.patel"}]},
+{id:12,n:"Unknown Slack Agent",v:"?",lc:"none",dp:"shadow",sb:"unsandboxed",ow:"Unknown",ok:"unk",caps:["messaging"],pr:["mcp"],ls:"10m ago",ep:"mcp://10.244.3.17:9090",cl:"ocp1 / marketing",desc:"Discovered by runtime scan. No registration. Pod: slack-bot-7d4f8b in marketing namespace. No sandbox.",auth:"Unknown",fw:"Unknown",model:"Unknown",mcps:[{n:"Slack MCP (unverified)",tools:["post_message","search_messages"],sc:["unknown"]}],hp:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,7,8,8,9,9],act:[{t:"10m ago",x:"Discovered by runtime scan",a:"system"},{t:"10m ago",x:"WARNING: No sandbox, no registration",a:"system"}]},
+{id:13,n:"Security Scanner",v:"?",lc:"none",dp:"shadow",sb:"unsandboxed",ow:"Unknown",ok:"unk",caps:["vulnerability-scanning","port-scanning"],pr:["a2a"],ls:"3m ago",ep:"https://10.244.5.22:8443/a2a",cl:"ocp1 / security-tools",desc:"Discovered by runtime scan. No registration. Elevated network permissions. No sandbox.",auth:"Unknown",fw:"Unknown",model:"Unknown",mcps:[],hp:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,9,10,10],act:[{t:"3m ago",x:"Discovered by runtime scan",a:"system"},{t:"3m ago",x:"ALERT: Elevated permissions + no sandbox",a:"system"}]}
+];
+
+function go(id,el){document.querySelectorAll('.vw').forEach(v=>v.classList.remove('on'));document.querySelectorAll('.nv button').forEach(b=>b.classList.remove('on'));document.getElementById('v-'+id).classList.add('on');el.classList.add('on');cd()}
+
+function lbl(s){const m={active:'pl-a',draft:'pl-d',deprecated:'pl-x',none:'pl-x'};return`<span class="pl ${m[s]||'pl-x'}">${s==='none'?'unreg':s}</span>`}
+function dbl(s){return`<span class="pl pl-${s[0]}">${s}</span>`}
+function sbl(s){return s==='sandboxed'?'<span class="pl pl-sb">sandboxed</span>':'<span class="pl pl-us">unsandboxed</span>'}
+
+function ren(list){document.getElementById('tb').innerHTML=list.map(a=>{
+  const rc=a.dp==='shadow'?' alert-row':a.dp==='stale'&&a.lc==='active'?' warn-row':'';
+  return`<tr class="${rc}" onclick="od(${a.id})">
+<td><span class="an">${a.n}</span><br><span class="asb">${a.v!=='?'?a.v:'unknown'} &middot; ${a.cl}</span></td>
+<td>${dbl(a.dp)} ${a.lc!=='none'?lbl(a.lc):''}</td>
+<td>${sbl(a.sb)}</td>
+<td style="font-size:.8rem">${a.ow}</td>
+<td>${a.caps.slice(0,2).map(c=>`<span class="cp">${c}</span>`).join('')}${a.caps.length>2?`<span class="cp">+${a.caps.length-2}</span>`:''}</td>
+<td style="font-size:.72rem;font-family:var(--fm);color:var(--mu);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.ep}</td>
+<td>${a.pr.map(p=>`<span class="pr pr-${p[0]}">${p.toUpperCase()}</span>`).join('')}</td>
+<td style="font-size:.78rem;color:${a.ls==='never'?'var(--dm)':'var(--mu)'}">${a.ls}</td></tr>`}).join('')}
+
+function filt(){const q=document.getElementById('q').value.toLowerCase(),fd=document.getElementById('fd').value,fs=document.getElementById('fs').value,fo=document.getElementById('fo').value;
+ren(A.filter(a=>{if(q&&!a.n.toLowerCase().includes(q)&&!a.caps.some(c=>c.includes(q))&&!a.desc.toLowerCase().includes(q))return false;if(fd!=='a'&&a.dp!==fd)return false;if(fs!=='a'&&a.sb!==fs)return false;if(fo!=='a'&&a.ok!==fo)return false;return true}))}
+
+function od(id){const a=A.find(x=>x.id===id);if(!a)return;
+const sn=['draft','active','deprecated'].map(s=>{let c='sn';if(a.lc===s)c+=s==='draft'?' cur-d':s==='deprecated'?' cur-x':' cur';return`<span class="${c}">${s}</span>`}).join('<span class="sa">→</span>');
+document.getElementById('dc').innerHTML=`
+<div style="margin-bottom:1rem"><h2 style="font-size:1.1rem;margin-bottom:.2rem">${a.n}</h2>
+<div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center">${dbl(a.dp)} ${sbl(a.sb)} ${a.lc!=='none'?lbl(a.lc):''}</div></div>
+<div class="ds"><h3>Details</h3>
+<p style="font-size:.8rem;color:var(--mu);margin:0 0 .5rem">${a.desc}</p>
+<div class="df"><span class="l">Endpoint</span><span class="v">${a.ep}</span></div>
+<div class="df"><span class="l">Cluster / NS</span><span class="v">${a.cl}</span></div>
+<div class="df"><span class="l">Owner</span><span class="v">${a.ow}</span></div>
+<div class="df"><span class="l">Protocol</span><span class="v">${a.pr.map(p=>`<span class="pr pr-${p[0]}">${p.toUpperCase()}</span>`).join(' ')}</span></div>
+<div class="df"><span class="l">Auth</span><span class="v">${a.auth}</span></div>
+<div class="df"><span class="l">Framework</span><span class="v">${a.fw}</span></div>
+<div class="df"><span class="l">Model</span><span class="v">${a.model}</span></div>
+<div class="df"><span class="l">Version</span><span class="v">${a.v}</span></div>
+</div>
+${a.lc!=='none'?`<div class="ds"><h3>Lifecycle</h3><div class="sm">${sn}</div></div>`:''}
+<div class="ds"><h3>Connected MCP servers (${a.mcps.length})</h3>
+${a.mcps.length===0?'<p style="font-size:.8rem;color:var(--dm)">None</p>':a.mcps.map(m=>`<div class="mcc"><h4>${m.n}</h4><div style="margin-bottom:.3rem">${m.tools.map(t=>`<span class="mt">${t}</span>`).join('')}</div><div style="font-size:.7rem;color:var(--dm)">Scopes: ${m.sc.join(', ')}</div></div>`).join('')}</div>
+<div class="ds"><h3>Health (30 days)</h3><div class="spk">${a.hp.map(h=>`<div class="b ${h===0?'z':h<5?'dn':'up'}" style="height:${Math.max(2,h*2.8)}px"></div>`).join('')}</div></div>
+<div class="ds"><h3>Activity</h3>${a.act.map(e=>`<div class="ai"><span class="tm">${e.t}</span> &middot; ${e.x}${e.a!=='system'?' <span class="ac">@'+e.a+'</span>':''}</div>`).join('')}</div>
+<div class="acts">
+${a.dp==='shadow'?'<button class="btn btn-g" onclick="toast(\'Registered as Draft. Pending approval.\')">Register</button><button class="btn btn-d" onclick="toast(\'Flagged for security review.\')">Flag for review</button>':''}
+${a.lc==='active'&&a.dp!=='shadow'?'<button class="btn btn-s" onclick="toast(\'Ownership transfer initiated.\')">Transfer ownership</button><button class="btn btn-d" onclick="toast(\'Deprecated.\')">Deprecate</button>':''}
+${a.lc==='draft'?'<button class="btn btn-g" onclick="toast(\'Approved. Now Active and discoverable.\')">Approve</button>':''}
+${a.sb==='unsandboxed'&&a.lc!=='none'?'<button class="btn btn-s" onclick="toast(\'Sandbox policy applied via OpenShell.\')">Apply sandbox</button>':''}
+${a.dp==='stale'&&a.lc==='active'?'<button class="btn btn-s" onclick="toast(\'Investigation started. Owner notified.\')">Investigate</button>':''}
+</div>`;
+document.getElementById('dp').classList.add('open')}
+function cd(){document.getElementById('dp').classList.remove('open')}
+
+function sf(t){document.getElementById('sq').value=t;doS()}
+function doS(){const q=document.getElementById('sq').value.toLowerCase();if(!q){document.getElementById('sres').innerHTML='';return}
+let r=A.filter(a=>a.lc==='active'&&[a.n,a.desc,...a.caps,...a.mcps.map(m=>m.n),...a.mcps.flatMap(m=>m.tools)].join(' ').toLowerCase().includes(q));
+r=r.map(a=>{const sc=(a.n.toLowerCase().includes(q)?3:0)+(a.caps.some(c=>c.includes(q))?2:0)+(a.dp==='healthy'?1:0);return{...a,sc}}).sort((x,y)=>y.sc-x.sc);
+document.getElementById('sres').innerHTML=r.length===0?'<p style="text-align:center;color:var(--dm);padding:1.8rem">No active agents match. Consider registering one.</p>':r.map(a=>`<div class="src" onclick="od(${a.id})"><div class="rh"><div><span class="rn">${a.n}</span> ${dbl(a.dp)} ${sbl(a.sb)} ${a.pr.map(p=>`<span class="pr pr-${p[0]}">${p.toUpperCase()}</span>`).join('')}</div><span class="rel ${a.sc>=4?'rel-h':'rel-m'}">${a.sc>=4?'HIGH':'MED'}</span></div><div class="rd">${a.desc}</div><div style="margin-top:.3rem">${a.caps.map(c=>`<span class="cp">${c}</span>`).join('')}</div>${a.mcps.length?`<div style="margin-top:.4rem;font-size:.76rem;color:var(--tl)">MCP: ${a.mcps.map(m=>m.n).join(', ')}</div>`:''}<div style="margin-top:.3rem;font-size:.72rem;color:var(--dm)">${a.ep} &middot; ${a.cl}</div></div>`).join('')}
+
+function toast(m){const t=document.getElementById('tt');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200)}
+function ce(){navigator.clipboard.writeText(`Agent Registry\nTotal: ${A.length}\nHealthy: ${A.filter(a=>a.dp==='healthy').length} | Stale: ${A.filter(a=>a.dp==='stale').length} | Shadow: ${A.filter(a=>a.dp==='shadow').length}\nSandboxed: ${A.filter(a=>a.sb==='sandboxed').length} | Unsandboxed: ${A.filter(a=>a.sb!=='sandboxed').length}\n\n${A.map(a=>`- ${a.n} [${a.dp}/${a.sb}] owner:${a.ow} ep:${a.ep} last:${a.ls}`).join('\n')}`).then(()=>toast('Copied'))}
+ren(A);
+</script>
+</body>
+</html>
